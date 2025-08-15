@@ -97,12 +97,11 @@ qrArray.forEach(item => {
 
   // item dạng: "Tên tài sản-Mã QR|Tên tài sản"
   const parts = item.split("|"); 
-  let maQRFull = parts[0] || "";
-  const tenTS = parts[1] || "";
-
-  // Lấy mã QR sau dấu "-"
-  const maParts = maQRFull.split("-");
-  const maQR = maParts.length > 1 ? maParts[1] : maQRFull;
+  const labelText = parts[0] || ""; // giữ nguyên label hiển thị "Tai nghe-TS_994B61C3"
+  
+  // Tách mã QR thực tế để tạo QR code
+  const maParts = labelText.split("-");
+  const maQR = maParts.length > 1 ? maParts[1] : labelText;
 
   const itemDiv = document.createElement("div");
   itemDiv.className = "qr-item";
@@ -113,14 +112,14 @@ qrArray.forEach(item => {
   qrDiv.style.margin = "0 auto"; // căn giữa QR
 
   const label = document.createElement("p");
-  label.textContent = maQR + " - " + tenTS;
+  label.textContent = labelText; // hiển thị đầy đủ "Tai nghe-TS_994B61C3"
 
   itemDiv.appendChild(qrDiv);
   itemDiv.appendChild(label);
   container.appendChild(itemDiv);
 
   new QRCode(qrDiv, {
-    text: maQR,
+    text: maQR, // QR code chỉ là "TS_994B61C3"
     width: 100,
     height: 100,
     correctLevel: QRCode.CorrectLevel.H
