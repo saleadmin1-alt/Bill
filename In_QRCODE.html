@@ -5,10 +5,7 @@
 <title>In QR Code Tài sản</title>
 <style>
   @media print {
-    @page {
-      size: A4;
-      margin: 10mm;
-    }
+    @page { size: A4; margin: 10mm; }
     body { margin: 0; }
     button { display: none; } /* Ẩn nút in khi in */
   }
@@ -18,10 +15,7 @@
     padding: 10px;
   }
 
-  h2 {
-    text-align: center;
-    margin-bottom: 10px;
-  }
+  h2 { text-align: center; margin-bottom: 10px; }
 
   .info-row {
     margin-bottom: 10px;
@@ -29,9 +23,7 @@
     font-size: 14px;
   }
 
-  .info-row p {
-    margin: 2px 0;
-  }
+  .info-row p { margin: 2px 0; }
 
   button {
     display: block;
@@ -68,8 +60,8 @@
 <h2>Danh sách QR Code Tài sản</h2>
 
 <div class="info-row">
-  <p><strong>Mã IN:</strong> <span id="IDQR"></span></p>
-  <p><strong>Nhóm Tên tài sản:</strong> <span id="Nhom"></span></p>
+  <p><strong>Họ tên:</strong> <span id="IDQR"></span></p>
+  <p><strong>Năm sinh:</strong> <span id="Nhom"></span></p>
   <p><strong>Ngày in:</strong> <span id="ngayin"></span></p>
 </div>
 
@@ -85,14 +77,14 @@ function getQueryParam(name) {
 }
 
 // --- Lấy thông tin từ URL
-const rawData = getQueryParam("data"); // ví dụ: TS_001|Bàn làm việc_b_TS_002|Ghế văn phòng
+const rawData = getQueryParam("data"); 
 const qrArray = rawData ? rawData.split("_b_") : [];
 
 const IDQR = getQueryParam("IDQR");
 const Nhom = getQueryParam("Nhom");
 const ngayin = getQueryParam("ngayin");
 
-// --- Hiển thị thông tin
+// Hiển thị thông tin
 document.getElementById("IDQR").textContent = IDQR;
 document.getElementById("Nhom").textContent = Nhom;
 document.getElementById("ngayin").textContent = ngayin;
@@ -102,9 +94,15 @@ const container = document.getElementById("qrContainer");
 // --- Tạo QR code cho từng item
 qrArray.forEach(item => {
   if(!item) return;
-  const parts = item.split("|"); // TS_001|Tên tài sản
-  const maQR = parts[0];
+
+  // item dạng: "Tên tài sản-Mã QR|Tên tài sản"
+  const parts = item.split("|"); 
+  let maQRFull = parts[0] || "";
   const tenTS = parts[1] || "";
+
+  // Lấy mã QR sau dấu "-"
+  const maParts = maQRFull.split("-");
+  const maQR = maParts.length > 1 ? maParts[1] : maQRFull;
 
   const itemDiv = document.createElement("div");
   itemDiv.className = "qr-item";
