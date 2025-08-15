@@ -1,1 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>PHIẾU BÁN HÀNG</title>
+  <style>
+    @page {
+      size: A5 portrait;
+      margin: 8mm;
+    }
 
+    body {
+      font-family: "Times New Roman", serif;
+      font-size: 12px;
+      margin: 0;
+      padding: 0;
+      color: #000;
+      line-height: 1.2;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .header h3 {
+      font-size: 20px;
+      margin: 6px 0;
+    }
+
+    .info {
+      margin: 4px 0;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 2px 0;
+    }
+
+    .info-row p {
+      width: 48%;
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 11px;
+      table-layout: fixed;
+    }
+
+    table, th, td {
+      border: 1px solid #000;
+    }
+
+    th, td {
+      padding: 2px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    th:nth-child(1) {
+      width: 44%;
+      text-align: center;
+    }
+
+    td:nth-child(1) {
+      text-align: left;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      width: 9.3%;
+    }
+
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(4), td:nth-child(4),
+    th:nth-child(5), td:nth-child(5) {
+      width: 15.9%;
+    }
+
+    .left {
+      text-align: left;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .highlight-warning {
+      font-weight: bold;
+      background-color: yellow;
+      color: red;
+    }
+
+    .sign-block {
+      width: 100%;
+      max-width: 500px;
+      margin: 10px auto 0 auto;
+      font-size: 12px;
+    }
+
+    .sign-row {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .sign-row .col {
+      width: 48%;
+      text-align: center;
+      vertical-align: top;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .sign-label {
+      line-height: 1.1;
+      margin-top: 0;
+    }
+
+    .sign-row.time {
+      text-align: right;
+      font-style: italic;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div><strong>3H OPTICAL</strong></div>
+    <div>314 Nguyễn Thượng Hiền, P.5, Q. Phú Nhuận, TP.HCM</div>
+    <div>Điện thoại: 0909295209-0908539209</div>
+    <h3>PHIẾU BÁN HÀNG</h3>
+  </div>
+
+  <div class="info">
+    <div class="info-row">
+      <p><strong>Họ tên:</strong> <span id="hoten"></span></p>
+      <p><strong>Năm sinh:</strong> <span id="namsinh"></span></p>
+    </div>
+    <div class="info-row">
+      <p><strong>Giới tính:</strong> <span id="gioitinh"></span></p>
+      <p><strong>SĐT:</strong> <span id="sdt"></span></p>
+    </div>
+    <div class="info-row">
+      <p><strong>Địa chỉ:</strong> <span id="diachi"></span></p>
+    </div>
+    <div class="info-row">
+      <p><strong>Mã số:</strong> <span id="maso"></span></p>
+      <p><strong>Bác sĩ / KTV:</strong> <span id="bacsi"></span></p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>TÊN DỊCH VỤ</th>
+        <th>SL</th>
+        <th>ĐƠN GIÁ</th>
+        <th>CK</th>
+        <th>THÀNH TIỀN</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" class="left bold">TỔNG TIỀN CẦN THANH TOÁN</td>
+        <td id="tongtien"></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="left bold">TẠM ỨNG LẦN 1</td>
+        <td id="tamung1"></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="left bold">TẠM ỨNG LẦN 2</td>
+        <td id="tamung2"></td>
+      </tr>
+      <tr>
+        <td colspan="4" id="canthanhtoan-label" class="left bold">CẦN THANH TOÁN</td>
+        <td id="canthanhtoan"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="sign-block">
+    <div class="sign-row time">
+      <div class="col"></div>
+      <div class="col">
+        <div id="thoigian"></div>
+      </div>
+    </div>
+    <div class="sign-row">
+      <div class="col">
+        <div class="sign-label">
+          <div><strong>Khách hàng</strong></div>
+          <div>(Ký và ghi rõ họ tên)</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="sign-label">
+          <div><strong>Người thu tiền</strong></div>
+          <div>(Ký và ghi rõ họ tên)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <strong>QUÉT MÃ QR</strong><br>
+    <strong>ĐỂ THANH TOÁN</strong><br>
+    <img id="qrImage" src="" alt="QR Thanh toán" style="margin-top: 8px; width: 160px; height: auto;" />
+  </div>
+
+  <script>
+    function getParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return decodeURIComponent(urlParams.get(name) || "");
+    }
+
+    function formatVNTime() {
+      const nowVN = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+      const day = String(nowVN.getDate()).padStart(2, '0');
+      const month = String(nowVN.getMonth() + 1).padStart(2, '0');
+      const year = nowVN.getFullYear();
+      const hour = String(nowVN.getHours()).padStart(2, '0');
+      const minute = String(nowVN.getMinutes()).padStart(2, '0');
+      const second = String(nowVN.getSeconds()).padStart(2, '0');
+      return `Tp. Hồ Chí Minh, Ngày ${day} tháng ${month} năm ${year}<br>Lúc ${hour} giờ ${minute} phút ${second} giây`;
+    }
+
+    function injectData() {
+      const fields = ["hoten", "diachi", "maso", "gioitinh", "namsinh", "bacsi", "sdt"];
+      fields.forEach(field => {
+        const el = document.getElementById(field);
+        if (el) el.innerText = getParam(field);
+      });
+
+      const data = getParam("data");
+      let tongTienToanBo = 0;
+
+      if (data) {
+        const rows = data.split("_b_");
+        const html = rows.map(item => {
+          const [ten, sl, dongia, chietkhau, tongtien] = item.split("_a_");
+
+          const donGiaNum = parseFloat(dongia.replace(/[^\d]/g, "")) || 0;
+          const donGiaText = donGiaNum.toLocaleString("vi-VN") + " đ";
+
+          const tongTienNum = parseFloat(tongtien.replace(/[^\d]/g, "")) || 0;
+          const tongTienText = tongTienNum.toLocaleString("vi-VN") + " đ";
+          tongTienToanBo += tongTienNum;
+
+          const chietKhauNum = parseFloat(chietkhau.replace(/[^\d]/g, "")) || 0;
+          let chietKhauText = chietkhau;
+          if (chietKhauNum >= 1 && chietKhauNum <= 100) {
+            chietKhauText = chietKhauNum + " %";
+          } else if (chietKhauNum > 100) {
+            chietKhauText = chietKhauNum.toLocaleString("vi-VN") + " đ";
+          }
+
+          return `<tr>
+            <td class="left">${ten}</td>
+            <td>${sl}</td>
+            <td>${donGiaText}</td>
+            <td>${chietKhauText}</td>
+            <td>${tongTienText}</td>
+          </tr>`;
+        }).join("");
+        document.getElementById("table-body").innerHTML = html;
+      }
+
+      const tamung1 = parseFloat(getParam("tamung1").replace(/[^\d]/g, "")) || 0;
+      const tamung2 = parseFloat(getParam("tamung2").replace(/[^\d]/g, "")) || 0;
+      const tongTamUng = tamung1 + tamung2;
+      const canthanhtoan = tongTienToanBo - tongTamUng;
+
+      document.getElementById("tongtien").innerText = tongTienToanBo.toLocaleString("vi-VN") + " đ";
+      document.getElementById("tamung1").innerText = tamung1.toLocaleString("vi-VN") + " đ";
+      document.getElementById("tamung2").innerText = tamung2.toLocaleString("vi-VN") + " đ";
+
+      const canThanhToanEl = document.getElementById("canthanhtoan");
+      const labelEl = document.getElementById("canthanhtoan-label");
+
+      if (canthanhtoan >= 0) {
+        labelEl.innerText = "TỔNG TIỀN CHƯA THANH TOÁN";
+        labelEl.classList.remove("highlight-warning");
+        canThanhToanEl.innerText = canthanhtoan.toLocaleString("vi-VN") + " đ";
+      } else {
+        labelEl.innerText = "KHÁCH THANH TOÁN DƯ";
+        labelEl.classList.add("highlight-warning");
+        canThanhToanEl.innerText = Math.abs(canthanhtoan).toLocaleString("vi-VN") + " đ";
+      }
+
+      let qrAmount = 0;
+      if (tamung1 < 1 && tamung2 < 1) {
+        qrAmount = tongTienToanBo;
+      } else if (tamung1 > 1 && tamung2 < 1) {
+        qrAmount = tamung1;
+      } else if (tamung2 > 1) {
+        qrAmount = tamung2;
+      }
+
+      const hoten = getParam("hoten");
+      const qrUrl = `https://img.vietqr.io/image/Vietcombank-0501000023350-compact.jpg?amount=${qrAmount}&addInfo=CK ${encodeURIComponent(hoten)}&accountName=VO QUANG HUY`;
+      document.getElementById("qrImage").src = qrUrl;
+    }
+
+    document.getElementById("thoigian").innerHTML = formatVNTime();
+    injectData();
+    setTimeout(() => window.print(), 500);
+    setTimeout(() => window.close(), 5000);
+  </script>
+
+</body>
+</html>
