@@ -317,5 +317,23 @@
     setTimeout(() => window.close(), 5000);
   </script>
 
+  <p><strong>Tổng tiền:</strong> <span id="tongtien"></span></p>
+
+    <button onclick="window.print()">In hóa đơn</button>
+  </div>
+
+  <script>
+    function getQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      document.getElementById("id").textContent = params.get("id") || "";
+      document.getElementById("ten").textContent = params.get("ten") || "";
+      document.getElementById("sdt").textContent = params.get("sdt") || "";
+      document.getElementById("diachi").textContent = params.get("diachi") || "";
+      document.getElementById("ghichu").textContent = params.get("ghichu") || "";
+       document.getElementById("tongtien").textContent = params.get("tongtien") || "";
+    }
+
+    window.onload = getQueryParams;
+  </script>
 </body>
 </html>
