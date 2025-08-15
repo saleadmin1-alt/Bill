@@ -10,22 +10,50 @@
       margin: 10mm;
     }
     body { margin: 0; }
+    button { display: none; } /* Ẩn nút in khi in */
   }
 
-  body { font-family: Arial, sans-serif; }
+  body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .info-row {
+    margin-bottom: 10px;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  .info-row p {
+    margin: 2px 0;
+  }
+
+  button {
+    display: block;
+    margin: 10px auto;
+    padding: 6px 20px;
+    font-size: 14px;
+    cursor: pointer;
+  }
 
   .qr-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    page-break-inside: avoid;
+    gap: 15px;
+    justify-items: center; /* căn giữa từng QR */
+    margin-top: 10px;
   }
 
   .qr-item {
     text-align: center;
-    page-break-inside: avoid;
     padding: 5px;
     border: 1px solid #ddd;
+    page-break-inside: avoid;
   }
 
   .qr-item p {
@@ -33,24 +61,21 @@
     font-size: 12px;
     word-break: break-word;
   }
-
-  button {
-    margin: 10px 0;
-    padding: 5px 15px;
-    font-size: 14px;
-  }
 </style>
 </head>
 <body>
 
 <h2>Danh sách QR Code Tài sản</h2>
-<button onclick="window.print()">In QR Code</button>
-<div class="qr-container" id="qrContainer"></div>
+
 <div class="info-row">
-      <p><strong>Họ tên:</strong> <span id="IDQR"></span></p>
-      <p><strong>Năm sinh:</strong> <span id="Nhom"></span></p>
+  <p><strong>Mã IN:</strong> <span id="IDQR"></span></p>
+  <p><strong>Nhóm Tên tài sản:</strong> <span id="Nhom"></span></p>
   <p><strong>Ngày in:</strong> <span id="ngayin"></span></p>
-    </div>
+</div>
+
+<button onclick="window.print()">In QR Code</button>
+
+<div class="qr-container" id="qrContainer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
@@ -59,20 +84,27 @@ function getQueryParam(name) {
   return params.get(name) || "";
 }
 
-// --- Lấy dữ liệu từ URL
-const rawData = getQueryParam("data"); // ví dụ: TS_001_b_TS_002_b_TS_003
+// --- Lấy thông tin từ URL
+const rawData = getQueryParam("data"); // ví dụ: TS_001|Bàn làm việc_b_TS_002|Ghế văn phòng
 const qrArray = rawData ? rawData.split("_b_") : [];
 
-// --- Nếu muốn lấy thêm tham số khác
 const IDQR = getQueryParam("IDQR");
 const Nhom = getQueryParam("Nhom");
 const ngayin = getQueryParam("ngayin");
 
+// --- Hiển thị thông tin
+document.getElementById("IDQR").textContent = IDQR;
+document.getElementById("Nhom").textContent = Nhom;
+document.getElementById("ngayin").textContent = ngayin;
+
 const container = document.getElementById("qrContainer");
 
-// --- Tạo QR code cho từng mã
-qrArray.forEach(maQR => {
-  if(!maQR) return;
+// --- Tạo QR code cho từng item
+qrArray.forEach(item => {
+  if(!item) return;
+  const parts = item.split("|"); // TS_001|Tên tài sản
+  const maQR = parts[0];
+  const tenTS = parts[1] || "";
 
   const itemDiv = document.createElement("div");
   itemDiv.className = "qr-item";
@@ -80,9 +112,10 @@ qrArray.forEach(maQR => {
   const qrDiv = document.createElement("div");
   qrDiv.style.width = "100px";
   qrDiv.style.height = "100px";
+  qrDiv.style.margin = "0 auto"; // căn giữa QR
 
   const label = document.createElement("p");
-  label.textContent = maQR; // có thể thêm Nhom hoặc IDQR nếu muốn
+  label.textContent = maQR + " - " + tenTS;
 
   itemDiv.appendChild(qrDiv);
   itemDiv.appendChild(label);
@@ -96,5 +129,6 @@ qrArray.forEach(maQR => {
   });
 });
 </script>
+
 </body>
 </html>
