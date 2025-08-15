@@ -1,72 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Hóa đơn</title>
+  <title>In QR Code Tài Sản</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    .invoice { max-width: 600px; margin: auto; border: 1px solid #ccc; padding: 20px; }
-    h1 { text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    .total { text-align: right; font-weight: bold; }
-    @media print {
-      button { display: none; }
-    }
+    body { font-family: sans-serif; }
+    .item { display: inline-block; margin: 10px; text-align: center; }
+    .qr { width: 128px; height: 128px; margin-bottom: 5px; }
   </style>
 </head>
 <body>
-  <div class="invoice">
-    <h1>HÓA ĐƠN</h1>
-   
-    <p><strong>Mã đặt chỗ:</strong> <span id="id"></span></p>
-    <p><strong>Thông tin liên hệ:</strong> <span id="ten"></span></p>
-    <p><strong>Hành trình:</strong> <span id="sdt"></span></p>
-    <p><strong>Trạng thái:</strong> <span id="diachi"></span></p>
-    <p><strong>Ghi chú:</strong> <span id="ghichu"></span></p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Sản phẩm</th>
-          <th>Số lượng</th>
-          <th>Đơn giá</th>
-          <th>Thành tiền</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>sp1</td>
-          <td>2</td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>Sp2</td>
-          <td>1</td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p><strong>Tổng tiền:</strong> <span id="tongtien"></span></p>
-
-    <button onclick="window.print()">In hóa đơn</button>
-  </div>
+  <h1>QR Code Tài Sản</h1>
+  <div id="container"></div>
 
   <script>
-    function getQueryParams() {
-      const params = new URLSearchParams(window.location.search);
-      document.getElementById("id").textContent = params.get("id") || "";
-      document.getElementById("ten").textContent = params.get("ten") || "";
-      document.getElementById("sdt").textContent = params.get("sdt") || "";
-      document.getElementById("diachi").textContent = params.get("diachi") || "";
-      document.getElementById("ghichu").textContent = params.get("ghichu") || "";
-       document.getElementById("tongtien").textContent = params.get("tongtien") || "";
-    }
+    // Danh sách tài sản (ID + tên)
+    const assets = [
+      { id: "TS_001", name: "Laptop Dell" },
+      { id: "TS_002", name: "Máy in HP" },
+      { id: "TS_003", name: "Điều hòa Panasonic" }
+    ];
 
-    window.onload = getQueryParams;
+    const container = document.getElementById("container");
+
+    assets.forEach(asset => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      const qrDiv = document.createElement("div");
+      qrDiv.className = "qr";
+      div.appendChild(qrDiv);
+
+      // Sinh QR code (có thể thay URL AppSheet ở đây)
+      new QRCode(qrDiv, {
+        text: `https://your-app-url.com?asset=${asset.id}`,
+        width: 128,
+        height: 128
+      });
+
+      const label = document.createElement("div");
+      label.textContent = `${asset.name} (${asset.id})`;
+      div.appendChild(label);
+
+      container.appendChild(div);
+    });
   </script>
 </body>
 </html>
