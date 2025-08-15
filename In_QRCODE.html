@@ -33,53 +33,63 @@
     font-size: 12px;
     word-break: break-word;
   }
+
+  button {
+    margin: 10px 0;
+    padding: 5px 15px;
+    font-size: 14px;
+  }
 </style>
 </head>
 <body>
 
 <h2>Danh sách QR Code Tài sản</h2>
+<button onclick="window.print()">In QR Code</button>
 <div class="qr-container" id="qrContainer"></div>
 
-<!-- QRCode.js -->
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
-  // --- Data truyền từ bên ngoài
-  const data = [
-    { "maQR": "TS_001", "tenTaiSan": "Bàn làm việc" },
-    { "maQR": "TS_002", "tenTaiSan": "Ghế văn phòng" },
-    { "maQR": "TS_003", "tenTaiSan": "Laptop" },
-    { "maQR": "TS_004", "tenTaiSan": "Máy in" },
-    { "maQR": "TS_005", "tenTaiSan": "Tủ hồ sơ" },
-    // ... các tài sản khác
-  ];
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name) || "";
+}
 
-  const container = document.getElementById("qrContainer");
+// --- Lấy dữ liệu từ URL
+const rawData = getQueryParam("data"); // ví dụ: TS_001_b_TS_002_b_TS_003
+const qrArray = rawData ? rawData.split("_b_") : [];
 
-  data.forEach(item => {
-    const itemDiv = document.createElement("div");
-    itemDiv.className = "qr-item";
+// --- Nếu muốn lấy thêm tham số khác
+const IDQR = getQueryParam("IDQR");
+const Nhom = getQueryParam("Nhom");
+const ngayin = getQueryParam("ngayin");
 
-    const qrDiv = document.createElement("div");
-    qrDiv.style.width = "100px";
-    qrDiv.style.height = "100px";
+const container = document.getElementById("qrContainer");
 
-    const label = document.createElement("p");
-    label.textContent = item.maQR + " - " + item.tenTaiSan;
+// --- Tạo QR code cho từng mã
+qrArray.forEach(maQR => {
+  if(!maQR) return;
 
-    itemDiv.appendChild(qrDiv);
-    itemDiv.appendChild(label);
-    container.appendChild(itemDiv);
+  const itemDiv = document.createElement("div");
+  itemDiv.className = "qr-item";
 
-    new QRCode(qrDiv, {
-      text: item.maQR,
-      width: 100,
-      height: 100,
-      correctLevel: QRCode.CorrectLevel.H
-    });
+  const qrDiv = document.createElement("div");
+  qrDiv.style.width = "100px";
+  qrDiv.style.height = "100px";
+
+  const label = document.createElement("p");
+  label.textContent = maQR; // có thể thêm Nhom hoặc IDQR nếu muốn
+
+  itemDiv.appendChild(qrDiv);
+  itemDiv.appendChild(label);
+  container.appendChild(itemDiv);
+
+  new QRCode(qrDiv, {
+    text: maQR,
+    width: 100,
+    height: 100,
+    correctLevel: QRCode.CorrectLevel.H
   });
-
-  // --- Nếu muốn tự mở in khi load
-  // window.print();
+});
 </script>
 </body>
 </html>
