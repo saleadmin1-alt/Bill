@@ -7,7 +7,7 @@
   @media print {
     @page { size: A4; margin: 10mm; }
     body { margin: 0; }
-    button { display: none; } /* Ẩn nút in khi in */
+    button, #colInput { display: none; } /* Ẩn khi in */
   }
 
   body {
@@ -25,9 +25,19 @@
 
   .info-row p { margin: 2px 0; }
 
+  .controls {
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  input[type="number"] {
+    width: 50px;
+    padding: 4px;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
   button {
-    display: block;
-    margin: 10px auto;
     padding: 6px 20px;
     font-size: 14px;
     cursor: pointer;
@@ -35,9 +45,8 @@
 
   .qr-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-    justify-items: center; /* căn giữa từng QR */
+    justify-items: center; /* căn giữa QR */
     margin-top: 10px;
   }
 
@@ -65,7 +74,12 @@
   <p><strong>Ngày in:</strong> <span id="ngayin"></span></p>
 </div>
 
-<button onclick="window.print()">In QR Code</button>
+<div class="controls">
+  <label for="colInput">Số cột:</label>
+  <input type="number" id="colInput" value="4" min="1" max="6">
+  <button onclick="renderQR()">Cập nhật</button>
+  <button onclick="window.print()">In QR Code</button>
+</div>
 
 <div class="qr-container" id="qrContainer"></div>
 
@@ -91,40 +105,47 @@ document.getElementById("ngayin").textContent = ngayin;
 
 const container = document.getElementById("qrContainer");
 
-// --- Tạo QR code cho từng item
-qrArray.forEach(item => {
-  if(!item) return;
+// --- Hàm render QR code
+function renderQR() {
+  const numCols = parseInt(document.getElementById("colInput").value) || 4;
+  container.innerHTML = "";
+  container.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
 
-  // item dạng: "Tên tài sản-Mã QR|Tên tài sản"
-  const parts = item.split("|"); 
-  const labelText = parts[0] || ""; // giữ nguyên label hiển thị "Tai nghe-TS_994B61C3"
-  
-  // Tách mã QR thực tế để tạo QR code
-  const maParts = labelText.split("-");
-  const maQR = maParts.length > 1 ? maParts[1] : labelText;
+  qrArray.forEach(item => {
+    if(!item) return;
 
-  const itemDiv = document.createElement("div");
-  itemDiv.className = "qr-item";
+    // item dạng: "Tên tài sản-Mã QR|Tên tài sản"
+    const parts = item.split("|"); 
+    const labelText = parts[0] || ""; // giữ label
+    const maParts = labelText.split("-");
+    const maQR = maParts.length > 1 ? maParts[1] : labelText;
 
-  const qrDiv = document.createElement("div");
-  qrDiv.style.width = "100px";
-  qrDiv.style.height = "100px";
-  qrDiv.style.margin = "0 auto"; // căn giữa QR
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "qr-item";
 
-  const label = document.createElement("p");
-  label.textContent = labelText; // hiển thị đầy đủ "Tai nghe-TS_994B61C3"
+    const qrDiv = document.createElement("div");
+    qrDiv.style.width = "100px";
+    qrDiv.style.height = "100px";
+    qrDiv.style.margin = "0 auto";
 
-  itemDiv.appendChild(qrDiv);
-  itemDiv.appendChild(label);
-  container.appendChild(itemDiv);
+    const label = document.createElement("p");
+    label.textContent = labelText;
 
-  new QRCode(qrDiv, {
-    text: maQR, // QR code chỉ là "TS_994B61C3"
-    width: 100,
-    height: 100,
-    correctLevel: QRCode.CorrectLevel.H
+    itemDiv.appendChild(qrDiv);
+    itemDiv.appendChild(label);
+    container.appendChild(itemDiv);
+
+    new QRCode(qrDiv, {
+      text: maQR,
+      width: 100,
+      height: 100,
+      correctLevel: QRCode.CorrectLevel.H
+    });
   });
-});
+}
+
+// --- Render lần đầu
+renderQR();
 </script>
 
 </body>
