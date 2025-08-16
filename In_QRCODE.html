@@ -78,6 +78,10 @@
 <div class="controls">
   <label for="colInput">Số cột:</label>
   <input type="number" id="colInput" value="4" min="1" max="6">
+
+  <label for="sizeInput">Kích thước QR:</label>
+  <input type="number" id="sizeInput" value="100" min="50" max="300">
+
   <button onclick="renderQR()">Cập nhật</button>
   <button onclick="window.print()">In QR Code</button>
 </div>
@@ -109,15 +113,16 @@ const container = document.getElementById("qrContainer");
 // --- Hàm render QR code
 function renderQR() {
   const numCols = parseInt(document.getElementById("colInput").value) || 4;
+  const qrSize = parseInt(document.getElementById("sizeInput").value) || 100;
+
   container.innerHTML = "";
   container.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
 
   qrArray.forEach(item => {
     if(!item) return;
 
-    // item dạng: "Tên tài sản-Mã QR|Tên tài sản"
     const parts = item.split("|"); 
-    const labelText = parts[0] || ""; // giữ label
+    const labelText = parts[0] || ""; 
     const maParts = labelText.split("-");
     const maQR = maParts.length > 1 ? maParts[1] : labelText;
 
@@ -125,8 +130,8 @@ function renderQR() {
     itemDiv.className = "qr-item";
 
     const qrDiv = document.createElement("div");
-    qrDiv.style.width = "100px";
-    qrDiv.style.height = "100px";
+    qrDiv.style.width = qrSize + "px";
+    qrDiv.style.height = qrSize + "px";
     qrDiv.style.margin = "0 auto";
 
     const label = document.createElement("p");
@@ -138,13 +143,12 @@ function renderQR() {
 
     new QRCode(qrDiv, {
       text: maQR,
-      width: 100,
-      height: 100,
+      width: qrSize,
+      height: qrSize,
       correctLevel: QRCode.CorrectLevel.H
     });
   });
 }
-
 // --- Render lần đầu
 renderQR();
 </script>
