@@ -2,12 +2,12 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>In QR Code Tài sản</title>
+<title>In QR / Barcode Tài sản</title>
 <style>
   @media print {
     @page { size: A4; margin: 10mm; }
     body { margin: 0; }
-    button, #colInput { display: none; } /* Ẩn khi in */
+    button, #colInput, #sizeInput, #typeSelect { display: none; } /* Ẩn khi in */
     h2, .info-row, .controls { display: none; } /* Ẩn khi in */
   }
 
@@ -31,8 +31,7 @@
     text-align: center;
   }
 
-  input[type="number"] {
-    width: 50px;
+  input[type="number"], select {
     padding: 4px;
     font-size: 14px;
     margin-right: 10px;
@@ -47,7 +46,7 @@
   .qr-container {
     display: grid;
     gap: 15px;
-    justify-items: center; /* căn giữa QR */
+    justify-items: center;
     margin-top: 10px;
   }
 
@@ -67,28 +66,38 @@
 </head>
 <body>
 
-<h2>Danh sách QR Code Tài sản</h2>
+<h2>Danh sách QR / Barcode Tài sản</h2>
 
 <div class="info-row">
   <p><strong>Mã in:</strong> <span id="IDQR"></span></p>
-  <p><strong>Nhóm	Tên tài sản:</strong> <span id="Nhom"></span></p>
+  <p><strong>Nhóm Tên tài sản:</strong> <span id="Nhom"></span></p>
   <p><strong>Ngày in:</strong> <span id="ngayin"></span></p>
 </div>
 
 <div class="controls">
+  <label for="typeSelect">Kiểu:</label>
+  <select id="typeSelect">
+    <option value="qr">QR Code</option>
+    <option value="barcode">Barcode</option>
+  </select>
+
   <label for="colInput">Số cột:</label>
   <input type="number" id="colInput" value="6" min="1" max="10">
 
-  <label for="sizeInput">Kích thước QR:</label>
+  <label for="sizeInput">Kích thước:</label>
   <input type="number" id="sizeInput" value="150" min="50" max="1000">
 
-  <button onclick="renderQR()">Cập nhật</button>
+  <button onclick="renderCodes()">Cập nhật</button>
   <button onclick="window.print()"> 🖨️</button>
 </div>
 
 <div class="qr-container" id="qrContainer"></div>
 
+<!-- Thư viện QR -->
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<!-- Thư viện Barcode -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
 <script>
 function getQueryParam(name) {
   const params = new URLSearchParams(window.location.search);
@@ -110,10 +119,11 @@ document.getElementById("ngayin").textContent = ngayin;
 
 const container = document.getElementById("qrContainer");
 
-// --- Hàm render QR code
-function renderQR() {
+// --- Hàm render (QR hoặc Barcode)
+function renderCodes() {
   const numCols = parseInt(document.getElementById("colInput").value) || 4;
-  const qrSize = parseInt(document.getElementById("sizeInput").value) || 100;
+  const size = parseInt(document.getElementById("sizeInput").value) || 100;
+  const type = document.getElementById("typeSelect").value;
 
   container.innerHTML = "";
   container.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
@@ -124,33 +134,46 @@ function renderQR() {
     const parts = item.split("|"); 
     const labelText = parts[0] || ""; 
     const maParts = labelText.split("-");
-    const maQR = maParts.length > 1 ? maParts[1] : labelText;
+    const maCode = maParts.length > 1 ? maParts[1] : labelText;
 
     const itemDiv = document.createElement("div");
     itemDiv.className = "qr-item";
 
-    const qrDiv = document.createElement("div");
-    qrDiv.style.width = qrSize + "px";
-    qrDiv.style.height = qrSize + "px";
-    qrDiv.style.margin = "0 auto";
+    const codeDiv = document.createElement("div");
+    codeDiv.style.width = size + "px";
+    codeDiv.style.height = size + "px";
+    codeDiv.style.margin = "0 auto";
 
     const label = document.createElement("p");
     label.textContent = labelText;
 
-    itemDiv.appendChild(qrDiv);
+    itemDiv.appendChild(codeDiv);
     itemDiv.appendChild(label);
     container.appendChild(itemDiv);
 
-    new QRCode(qrDiv, {
-      text: maQR,
-      width: qrSize,
-      height: qrSize,
-      correctLevel: QRCode.CorrectLevel.H
-    });
+    if(type === "qr"){
+      new QRCode(codeDiv, {
+        text: maCode,
+        width: size,
+        height: size,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    } else {
+      const svg = document.createElement("svg");
+      codeDiv.appendChild(svg);
+      JsBarcode(svg, maCode, {
+        format: "CODE128",
+        width: 2,
+        height: size * 0.4,
+        displayValue: false,
+        margin: 0
+      });
+    }
   });
 }
+
 // --- Render lần đầu
-renderQR();
+renderCodes();
 </script>
 
 </body>
