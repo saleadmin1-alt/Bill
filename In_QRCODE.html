@@ -7,70 +7,23 @@
   @media print {
     @page { size: A4; margin: 10mm; }
     body { margin: 0; }
-    button, #colInput, #sizeInput, #widthInput, #heightInput, #typeSelect, #showValue { display: none; }
+    button, #colInput, #sizeInput, #widthInput, #heightInput, #typeSelect { display: none; }
     h2, .info-row, .controls { display: none; }
   }
 
-  body {
-    font-family: Arial, sans-serif;
-    padding: 10px;
-  }
-
+  body { font-family: Arial, sans-serif; padding: 10px; }
   h2 { text-align: center; margin-bottom: 10px; }
-
-  .info-row {
-    margin-bottom: 10px;
-    text-align: left;
-    font-size: 14px;
-  }
-
-  .controls {
-    margin: 10px 0;
-    text-align: center;
-  }
-
-  input[type="number"], select {
-    padding: 4px;
-    font-size: 14px;
-    margin-right: 10px;
-  }
-
-  button {
-    padding: 6px 20px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-
-  .qr-container {
-    display: grid;
-    gap: 15px;
-    justify-items: center;
-    margin-top: 10px;
-  }
-
-  .qr-item {
-    text-align: center;
-    padding: 5px;
-    border: 1px solid #ddd;
-    page-break-inside: avoid;
-  }
-
-  .qr-item p {
-    margin: 5px 0 0 0;
-    font-size: 12px;
-    word-break: break-word;
-  }
+  .controls { margin: 10px 0; text-align: center; }
+  input[type="number"], select { padding: 4px; font-size: 14px; margin-right: 10px; }
+  button { padding: 6px 20px; font-size: 14px; cursor: pointer; }
+  .qr-container { display: grid; gap: 15px; justify-items: center; margin-top: 10px; }
+  .qr-item { text-align: center; padding: 5px; border: 1px solid #ddd; page-break-inside: avoid; }
+  .qr-item p { margin: 5px 0 0 0; font-size: 12px; word-break: break-word; }
 </style>
 </head>
 <body>
 
 <h2>Danh sách QR / Barcode Tài sản</h2>
-
-<div class="info-row">
-  <p><strong>Mã in:</strong> <span id="IDQR"></span></p>
-  <p><strong>Nhóm Tên tài sản:</strong> <span id="Nhom"></span></p>
-  <p><strong>Ngày in:</strong> <span id="ngayin"></span></p>
-</div>
 
 <div class="controls">
   <label for="typeSelect">Kiểu:</label>
@@ -80,15 +33,15 @@
   </select>
 
   <label for="colInput">Số cột:</label>
-  <input type="number" id="colInput" value="6" min="1" max="10">
+  <input type="number" id="colInput" value="4" min="1" max="10">
 
-  <!-- Kích thước QR -->
+  <!-- QR -->
   <span id="qrSizeGroup">
     <label for="sizeInput">Kích thước QR:</label>
     <input type="number" id="sizeInput" value="150" min="50" max="1000">
   </span>
 
-  <!-- Kích thước Barcode -->
+  <!-- Barcode -->
   <span id="barcodeSizeGroup" style="display:none;">
     <label for="widthInput">Rộng:</label>
     <input type="number" id="widthInput" value="2" min="1" max="10">
@@ -97,10 +50,8 @@
     <input type="number" id="heightInput" value="80" min="20" max="500">
   </span>
 
-  <label><input type="checkbox" id="showValue"> Hiện số dưới Barcode</label>
-
   <button onclick="renderCodes()">Cập nhật</button>
-  <button onclick="window.print()"> 🖨️</button>
+  <button onclick="window.print()"> 🖨️ In</button>
 </div>
 
 <div class="qr-container" id="qrContainer"></div>
@@ -116,43 +67,29 @@ function getQueryParam(name) {
   return params.get(name) || "";
 }
 
-// --- Lấy thông tin từ URL
 const rawData = getQueryParam("data"); 
 const qrArray = rawData ? rawData.split("_b_") : [];
 
-const IDQR = getQueryParam("IDQR");
-const Nhom = getQueryParam("Nhom");
-const ngayin = getQueryParam("ngayin");
-
-document.getElementById("IDQR").textContent = IDQR;
-document.getElementById("Nhom").textContent = Nhom;
-document.getElementById("ngayin").textContent = ngayin;
-
-const container = document.getElementById("qrContainer");
-
-// Ẩn/hiện input theo kiểu chọn
 function toggleSizeInputs(){
   const type = document.getElementById("typeSelect").value;
   document.getElementById("qrSizeGroup").style.display = (type === "qr") ? "inline" : "none";
   document.getElementById("barcodeSizeGroup").style.display = (type === "barcode") ? "inline" : "none";
 }
 
-// Render mã
 function renderCodes() {
   const numCols = parseInt(document.getElementById("colInput").value) || 4;
   const type = document.getElementById("typeSelect").value;
-  const showValue = document.getElementById("showValue").checked;
 
   const qrSize = parseInt(document.getElementById("sizeInput").value) || 100;
   const barWidth = parseInt(document.getElementById("widthInput").value) || 2;
   const barHeight = parseInt(document.getElementById("heightInput").value) || 80;
 
+  const container = document.getElementById("qrContainer");
   container.innerHTML = "";
   container.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
 
   qrArray.forEach(item => {
     if(!item) return;
-
     const parts = item.split("|"); 
     const labelText = parts[0] || ""; 
     const maParts = labelText.split("-");
@@ -187,7 +124,7 @@ function renderCodes() {
         format: "CODE128",
         width: barWidth,
         height: barHeight,
-        displayValue: showValue,
+        displayValue: true, // ✅ luôn hiện số code dưới barcode
         fontSize: 14,
         margin: 0
       });
@@ -195,7 +132,7 @@ function renderCodes() {
   });
 }
 
-// --- Render lần đầu
+// render lần đầu
 renderCodes();
 </script>
 
