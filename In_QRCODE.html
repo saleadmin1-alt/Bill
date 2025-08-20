@@ -7,8 +7,8 @@
   @media print {
     @page { size: A4; margin: 10mm; }
     body { margin: 0; }
-    button, #colInput, #sizeInput, #typeSelect { display: none; } /* Ẩn khi in */
-    h2, .info-row, .controls { display: none; } /* Ẩn khi in */
+    button, #colInput, #sizeInput, #widthInput, #heightInput, #typeSelect, #showValue { display: none; }
+    h2, .info-row, .controls { display: none; }
   }
 
   body {
@@ -23,8 +23,6 @@
     text-align: left;
     font-size: 14px;
   }
-
-  .info-row p { margin: 2px 0; }
 
   .controls {
     margin: 10px 0;
@@ -76,7 +74,7 @@
 
 <div class="controls">
   <label for="typeSelect">Kiểu:</label>
-  <select id="typeSelect">
+  <select id="typeSelect" onchange="toggleSizeInputs()">
     <option value="qr">QR Code</option>
     <option value="barcode">Barcode</option>
   </select>
@@ -84,8 +82,22 @@
   <label for="colInput">Số cột:</label>
   <input type="number" id="colInput" value="6" min="1" max="10">
 
-  <label for="sizeInput">Kích thước:</label>
-  <input type="number" id="sizeInput" value="150" min="50" max="1000">
+  <!-- Kích thước QR -->
+  <span id="qrSizeGroup">
+    <label for="sizeInput">Kích thước QR:</label>
+    <input type="number" id="sizeInput" value="150" min="50" max="1000">
+  </span>
+
+  <!-- Kích thước Barcode -->
+  <span id="barcodeSizeGroup" style="display:none;">
+    <label for="widthInput">Rộng:</label>
+    <input type="number" id="widthInput" value="2" min="1" max="10">
+
+    <label for="heightInput">Cao:</label>
+    <input type="number" id="heightInput" value="80" min="20" max="500">
+  </span>
+
+  <label><input type="checkbox" id="showValue"> Hiện số dưới Barcode</label>
 
   <button onclick="renderCodes()">Cập nhật</button>
   <button onclick="window.print()"> 🖨️</button>
@@ -112,18 +124,28 @@ const IDQR = getQueryParam("IDQR");
 const Nhom = getQueryParam("Nhom");
 const ngayin = getQueryParam("ngayin");
 
-// Hiển thị thông tin
 document.getElementById("IDQR").textContent = IDQR;
 document.getElementById("Nhom").textContent = Nhom;
 document.getElementById("ngayin").textContent = ngayin;
 
 const container = document.getElementById("qrContainer");
 
-// --- Hàm render (QR hoặc Barcode)
+// Ẩn/hiện input theo kiểu chọn
+function toggleSizeInputs(){
+  const type = document.getElementById("typeSelect").value;
+  document.getElementById("qrSizeGroup").style.display = (type === "qr") ? "inline" : "none";
+  document.getElementById("barcodeSizeGroup").style.display = (type === "barcode") ? "inline" : "none";
+}
+
+// Render mã
 function renderCodes() {
   const numCols = parseInt(document.getElementById("colInput").value) || 4;
-  const size = parseInt(document.getElementById("sizeInput").value) || 100;
   const type = document.getElementById("typeSelect").value;
+  const showValue = document.getElementById("showValue").checked;
+
+  const qrSize = parseInt(document.getElementById("sizeInput").value) || 100;
+  const barWidth = parseInt(document.getElementById("widthInput").value) || 2;
+  const barHeight = parseInt(document.getElementById("heightInput").value) || 80;
 
   container.innerHTML = "";
   container.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
@@ -140,8 +162,6 @@ function renderCodes() {
     itemDiv.className = "qr-item";
 
     const codeDiv = document.createElement("div");
-    codeDiv.style.width = size + "px";
-    codeDiv.style.height = size + "px";
     codeDiv.style.margin = "0 auto";
 
     const label = document.createElement("p");
@@ -152,10 +172,12 @@ function renderCodes() {
     container.appendChild(itemDiv);
 
     if(type === "qr"){
+      codeDiv.style.width = qrSize + "px";
+      codeDiv.style.height = qrSize + "px";
       new QRCode(codeDiv, {
         text: maCode,
-        width: size,
-        height: size,
+        width: qrSize,
+        height: qrSize,
         correctLevel: QRCode.CorrectLevel.H
       });
     } else {
@@ -163,9 +185,10 @@ function renderCodes() {
       codeDiv.appendChild(svg);
       JsBarcode(svg, maCode, {
         format: "CODE128",
-        width: 2,
-        height: size * 0.4,
-        displayValue: false,
+        width: barWidth,
+        height: barHeight,
+        displayValue: showValue,
+        fontSize: 14,
         margin: 0
       });
     }
