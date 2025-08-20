@@ -2,139 +2,74 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>In QR / Barcode Tài sản</title>
+<title>In QR Code / Barcode</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <style>
   @media print {
     @page { size: A4; margin: 10mm; }
     body { margin: 0; }
-    button, #colInput, #sizeInput, #widthInput, #heightInput, #typeSelect { display: none; }
-    h2, .info-row, .controls { display: none; }
+    button, select, input { display: none; }
   }
-
-  body { font-family: Arial, sans-serif; padding: 10px; }
-  h2 { text-align: center; margin-bottom: 10px; }
-  .controls { margin: 10px 0; text-align: center; }
-  input[type="number"], select { padding: 4px; font-size: 14px; margin-right: 10px; }
-  button { padding: 6px 20px; font-size: 14px; cursor: pointer; }
-  .qr-container { display: grid; gap: 15px; justify-items: center; margin-top: 10px; }
-  .qr-item { text-align: center; padding: 5px; border: 1px solid #ddd; page-break-inside: avoid; }
-  .qr-item p { margin: 5px 0 0 0; font-size: 12px; word-break: break-word; }
+  .preview { margin-top: 20px; }
 </style>
 </head>
 <body>
+  <h2>In QR Code / Barcode</h2>
+  <label>Nhập mã:</label>
+  <input type="text" id="textInput" value="TS_994B61C3"><br><br>
 
-<h2>Danh sách QR / Barcode Tài sản</h2>
-
-<div class="controls">
-  <label for="typeSelect">Kiểu:</label>
-  <select id="typeSelect" onchange="toggleSizeInputs()">
+  <label>Chọn loại:</label>
+  <select id="typeSelect" onchange="toggleSizeInput()">
     <option value="qr">QR Code</option>
     <option value="barcode">Barcode</option>
-  </select>
+  </select><br><br>
 
-  <label for="colInput">Số cột:</label>
-  <input type="number" id="colInput" value="4" min="1" max="10">
+  <div id="qrSizeInput">
+    <label>Kích thước (px):</label>
+    <input type="number" id="sizeInput" value="200">
+  </div>
 
-  <!-- QR -->
-  <span id="qrSizeGroup">
-    <label for="sizeInput">Kích thước QR:</label>
-    <input type="number" id="sizeInput" value="150" min="50" max="1000">
-  </span>
+  <div id="barcodeSizeInput" style="display:none;">
+    <label>Rộng (px):</label>
+    <input type="number" id="widthInput" value="2"> <br>
+    <label>Cao (px):</label>
+    <input type="number" id="heightInput" value="100">
+  </div><br>
 
-  <!-- Barcode -->
-  <span id="barcodeSizeGroup" style="display:none;">
-    <label for="widthInput">Rộng:</label>
-    <input type="number" id="widthInput" value="2" min="1" max="10">
+  <button onclick="generate()">Tạo mã</button>
+  <button onclick="window.print()">In</button>
 
-    <label for="heightInput">Cao:</label>
-    <input type="number" id="heightInput" value="80" min="20" max="500">
-  </span>
-
-  <button onclick="renderCodes()">Cập nhật</button>
-  <button onclick="window.print()"> 🖨️ In</button>
-</div>
-
-<div class="qr-container" id="qrContainer"></div>
-
-<!-- Thư viện QR -->
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<!-- Thư viện Barcode -->
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <div class="preview" id="preview"></div>
 
 <script>
-function getQueryParam(name) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name) || "";
+function toggleSizeInput() {
+  let type = document.getElementById("typeSelect").value;
+  document.getElementById("qrSizeInput").style.display = type === "qr" ? "block" : "none";
+  document.getElementById("barcodeSizeInput").style.display = type === "barcode" ? "block" : "none";
 }
 
-const rawData = getQueryParam("data"); 
-const qrArray = rawData ? rawData.split("_b_") : [];
+function generate() {
+  let text = document.getElementById("textInput").value;
+  let type = document.getElementById("typeSelect").value;
+  let preview = document.getElementById("preview");
+  preview.innerHTML = "";
 
-function toggleSizeInputs(){
-  const type = document.getElementById("typeSelect").value;
-  document.getElementById("qrSizeGroup").style.display = (type === "qr") ? "inline" : "none";
-  document.getElementById("barcodeSizeGroup").style.display = (type === "barcode") ? "inline" : "none";
+  if (type === "qr") {
+    let size = parseInt(document.getElementById("sizeInput").value) || 200;
+    let canvas = document.createElement("canvas");
+    QRCode.toCanvas(canvas, text, { width: size }, function (error) {
+      if (error) console.error(error);
+    });
+    preview.appendChild(canvas);
+  } else {
+    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    let width = parseInt(document.getElementById("widthInput").value) || 2;
+    let height = parseInt(document.getElementById("heightInput").value) || 100;
+    JsBarcode(svg, text, { format: "CODE128", width: width, height: height, displayValue: true });
+    preview.appendChild(svg);
+  }
 }
-
-function renderCodes() {
-  const numCols = parseInt(document.getElementById("colInput").value) || 4;
-  const type = document.getElementById("typeSelect").value;
-
-  const qrSize = parseInt(document.getElementById("sizeInput").value) || 100;
-  const barWidth = parseInt(document.getElementById("widthInput").value) || 2;
-  const barHeight = parseInt(document.getElementById("heightInput").value) || 80;
-
-  const container = document.getElementById("qrContainer");
-  container.innerHTML = "";
-  container.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
-
-  qrArray.forEach(item => {
-    if(!item) return;
-    const parts = item.split("|"); 
-    const labelText = parts[0] || ""; 
-    const maParts = labelText.split("-");
-    const maCode = maParts.length > 1 ? maParts[1] : labelText;
-
-    const itemDiv = document.createElement("div");
-    itemDiv.className = "qr-item";
-
-    const codeDiv = document.createElement("div");
-    codeDiv.style.margin = "0 auto";
-
-    const label = document.createElement("p");
-    label.textContent = labelText;
-
-    itemDiv.appendChild(codeDiv);
-    itemDiv.appendChild(label);
-    container.appendChild(itemDiv);
-
-    if(type === "qr"){
-      codeDiv.style.width = qrSize + "px";
-      codeDiv.style.height = qrSize + "px";
-      new QRCode(codeDiv, {
-        text: maCode,
-        width: qrSize,
-        height: qrSize,
-        correctLevel: QRCode.CorrectLevel.H
-      });
-    } else {
-      const svg = document.createElement("svg");
-      codeDiv.appendChild(svg);
-      JsBarcode(svg, maCode, {
-        format: "CODE128",
-        width: barWidth,
-        height: barHeight,
-        displayValue: true, // ✅ luôn hiện số code dưới barcode
-        fontSize: 14,
-        margin: 0
-      });
-    }
-  });
-}
-
-// render lần đầu
-renderCodes();
 </script>
-
 </body>
 </html>
