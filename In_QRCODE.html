@@ -2,74 +2,156 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>In QR Code / Barcode</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<title>In QR Code Tài sản</title>
 <style>
   @media print {
     @page { size: A4; margin: 10mm; }
     body { margin: 0; }
-    button, select, input { display: none; }
+    button, #colInput { display: none; } /* Ẩn khi in */
+    h2, .info-row, .controls { display: none; } /* Ẩn khi in */
   }
-  .preview { margin-top: 20px; }
+
+  body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+  }
+
+  h2 { text-align: center; margin-bottom: 10px; }
+
+  .info-row {
+    margin-bottom: 10px;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  .info-row p { margin: 2px 0; }
+
+  .controls {
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  input[type="number"] {
+    width: 50px;
+    padding: 4px;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  button {
+    padding: 6px 20px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .qr-container {
+    display: grid;
+    gap: 15px;
+    justify-items: center; /* căn giữa QR */
+    margin-top: 10px;
+  }
+
+  .qr-item {
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  .qr-item p {
+    margin: 5px 0 0 0;
+    font-size: 12px;
+    word-break: break-word;
+  }
 </style>
 </head>
 <body>
-  <h2>In QR Code / Barcode</h2>
-  <label>Nhập mã:</label>
-  <input type="text" id="textInput" value="TS_994B61C3"><br><br>
 
-  <label>Chọn loại:</label>
-  <select id="typeSelect" onchange="toggleSizeInput()">
-    <option value="qr">QR Code</option>
-    <option value="barcode">Barcode</option>
-  </select><br><br>
+<h2>Danh sách QR Code Tài sản</h2>
 
-  <div id="qrSizeInput">
-    <label>Kích thước (px):</label>
-    <input type="number" id="sizeInput" value="200">
-  </div>
+<div class="info-row">
+  <p><strong>Mã in:</strong> <span id="IDQR"></span></p>
+  <p><strong>Nhóm	Tên tài sản:</strong> <span id="Nhom"></span></p>
+  <p><strong>Ngày in:</strong> <span id="ngayin"></span></p>
+</div>
 
-  <div id="barcodeSizeInput" style="display:none;">
-    <label>Rộng (px):</label>
-    <input type="number" id="widthInput" value="2"> <br>
-    <label>Cao (px):</label>
-    <input type="number" id="heightInput" value="100">
-  </div><br>
+<div class="controls">
+  <label for="colInput">Số cột:</label>
+  <input type="number" id="colInput" value="6" min="1" max="10">
 
-  <button onclick="generate()">Tạo mã</button>
-  <button onclick="window.print()">In</button>
+  <label for="sizeInput">Kích thước QR:</label>
+  <input type="number" id="sizeInput" value="150" min="50" max="1000">
 
-  <div class="preview" id="preview"></div>
+  <button onclick="renderQR()">Cập nhật</button>
+  <button onclick="window.print()"> 🖨️</button>
+</div>
 
+<div class="qr-container" id="qrContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
-function toggleSizeInput() {
-  let type = document.getElementById("typeSelect").value;
-  document.getElementById("qrSizeInput").style.display = type === "qr" ? "block" : "none";
-  document.getElementById("barcodeSizeInput").style.display = type === "barcode" ? "block" : "none";
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name) || "";
 }
 
-function generate() {
-  let text = document.getElementById("textInput").value;
-  let type = document.getElementById("typeSelect").value;
-  let preview = document.getElementById("preview");
-  preview.innerHTML = "";
+// --- Lấy thông tin từ URL
+const rawData = getQueryParam("data"); 
+const qrArray = rawData ? rawData.split("_b_") : [];
 
-  if (type === "qr") {
-    let size = parseInt(document.getElementById("sizeInput").value) || 200;
-    let canvas = document.createElement("canvas");
-    QRCode.toCanvas(canvas, text, { width: size }, function (error) {
-      if (error) console.error(error);
+const IDQR = getQueryParam("IDQR");
+const Nhom = getQueryParam("Nhom");
+const ngayin = getQueryParam("ngayin");
+
+// Hiển thị thông tin
+document.getElementById("IDQR").textContent = IDQR;
+document.getElementById("Nhom").textContent = Nhom;
+document.getElementById("ngayin").textContent = ngayin;
+
+const container = document.getElementById("qrContainer");
+
+// --- Hàm render QR code
+function renderQR() {
+  const numCols = parseInt(document.getElementById("colInput").value) || 4;
+  const qrSize = parseInt(document.getElementById("sizeInput").value) || 100;
+
+  container.innerHTML = "";
+  container.style.gridTemplateColumns = `repeat(${numCols}, 1fr)`;
+
+  qrArray.forEach(item => {
+    if(!item) return;
+
+    const parts = item.split("|"); 
+    const labelText = parts[0] || ""; 
+    const maParts = labelText.split("-");
+    const maQR = maParts.length > 1 ? maParts[1] : labelText;
+
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "qr-item";
+
+    const qrDiv = document.createElement("div");
+    qrDiv.style.width = qrSize + "px";
+    qrDiv.style.height = qrSize + "px";
+    qrDiv.style.margin = "0 auto";
+
+    const label = document.createElement("p");
+    label.textContent = labelText;
+
+    itemDiv.appendChild(qrDiv);
+    itemDiv.appendChild(label);
+    container.appendChild(itemDiv);
+
+    new QRCode(qrDiv, {
+      text: maQR,
+      width: qrSize,
+      height: qrSize,
+      correctLevel: QRCode.CorrectLevel.H
     });
-    preview.appendChild(canvas);
-  } else {
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    let width = parseInt(document.getElementById("widthInput").value) || 2;
-    let height = parseInt(document.getElementById("heightInput").value) || 100;
-    JsBarcode(svg, text, { format: "CODE128", width: width, height: height, displayValue: true });
-    preview.appendChild(svg);
-  }
+  });
 }
+// --- Render lần đầu
+renderQR();
 </script>
+
 </body>
 </html>
