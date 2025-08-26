@@ -5,53 +5,28 @@
 <title>Hóa đơn bán hàng</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  body { 
-    font-family: Arial, sans-serif; 
-    margin: 10px; 
-    font-size: 14px; 
-  }
-  h2 { text-align: center; font-size: 18px; margin-bottom: 10px; }
-  #info p { margin: 2px 0; font-size: 14px; }
+body { font-family: Arial, sans-serif; margin: 10px; font-size: 14px; }
+h2 { text-align: center; font-size: 18px; margin-bottom: 10px; }
+#info p { margin: 2px 0; font-size: 14px; }
 
-  table { 
-    width: 100%; 
-    margin-top: 10px; 
-    font-size: 13px; 
-    table-layout: fixed;
-    border-collapse: collapse;
-  }
-  th, td { 
-    padding: 3px 5px; 
-    text-align: center; 
-    word-wrap: break-word;
-    border: none; /* bỏ viền */
-  }
-  th { background: #f9f9f9; font-weight: bold; }
-  .total-row td { font-weight: bold; }
+/* Bảng gọn, bỏ viền */
+table { width: 100%; margin-top: 10px; font-size: 13px; border-collapse: collapse; table-layout: fixed; }
+th, td { border: none; padding: 3px 5px; text-align: left; word-wrap: break-word; }
+th { font-weight: bold; background: #f9f9f9; }
+.total-row td { font-weight: bold; }
 
-  #printBtn {
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-  }
-  #printBtn:active { background: #0056b3; }
+/* In */
+@media print {
+  body { width: 58mm; margin:0; font-size:12px; }
+  #printBtn, #paperWidth, label { display: none; }
+  table { font-size: 12px; }
+}
 
-  label { font-size: 14px; }
-  #paperWidth { font-size: 14px; margin-left: 5px; }
-
-  @media print {
-    body { width: 58mm; margin: 0; font-size: 12px; }
-    #printBtn, #paperWidth, label { display: none; }
-    table { font-size: 12px; }
-  }
+/* Nút in và chọn khổ giấy */
+#printBtn { position: fixed; bottom:15px; right:15px; background:#007bff; color:#fff; border:none; padding:10px 16px; border-radius:8px; font-size:16px; cursor:pointer; box-shadow:0 3px 6px rgba(0,0,0,0.2); }
+#printBtn:active { background:#0056b3; }
+label { font-size:14px; }
+#paperWidth { font-size:14px; margin-left:5px; }
 </style>
 </head>
 <body>
@@ -67,21 +42,11 @@
 
 <div id="info"></div>
 <table id="billTable">
-  <thead>
-    <tr>
-      <th>STT</th>
-      <th>Tên hàng</th>
-      <th>SL</th>
-      <th>Đơn giá</th>
-      <th>Thành tiền</th>
-    </tr>
-  </thead>
   <tbody></tbody>
   <tfoot>
     <tr class="total-row">
-      <td colspan="2">TỔNG CỘNG</td>
+      <td>TỔNG CỘNG</td>
       <td id="tongSlCell">0</td>
-      <td></td>
       <td id="tongTienCell">0</td>
     </tr>
   </tfoot>
@@ -94,49 +59,35 @@ const params = new URLSearchParams(window.location.search);
 const id = params.get("id") || "";
 const ten = decodeURIComponent(params.get("ten") || "");
 const diachi = decodeURIComponent(params.get("diachi") || "");
+
 document.getElementById("info").innerHTML = `
-  <p><b>Mã đơn hàng:</b> ${id}</p>
-  <p><b>Khách hàng:</b> ${ten}</p>
-  <p><b>Địa chỉ:</b> ${diachi}</p>
+<p><b>Mã đơn hàng:</b> ${id}</p>
+<p><b>Khách hàng:</b> ${ten}</p>
+<p><b>Địa chỉ:</b> ${diachi}</p>
 `;
 
 const data = decodeURIComponent(params.get("data") || "");
-const rows = data.split("_n_"); 
+const rows = data.split("_n_");
 
 const tbody = document.querySelector("#billTable tbody");
-let tongTien = 0;
 let tongSL = 0;
+let tongTien = 0;
 
-rows.forEach((r, index) => {
-  if(r.trim() !== ""){
-    const cols = r.split("|"); 
+rows.forEach((r,index)=>{
+  if(r.trim()!==""){
+    const cols = r.split("|");
     const tr = document.createElement("tr");
-    
-    // STT
-    const tdStt = document.createElement("td");
-    tdStt.textContent = index + 1;
-    tr.appendChild(tdStt);
-    
-    // Lấy tên hàng, SL, Đơn giá, Thành tiền
-    const tdTen = document.createElement("td");
-    tdTen.textContent = cols[1] || "";
-    tr.appendChild(tdTen);
-    
-    const tdSL = document.createElement("td");
-    tdSL.textContent = cols[2] || "";
-    const sl = parseFloat(cols[2].replace(/[^0-9.-]/g,""))||0;
+
+    const td = document.createElement("td");
+    td.innerHTML = `<b>${index+1}. ${cols[1] || ""}</b><br>
+                    SL: ${cols[2] || ""} | Đơn giá: ${cols[3] || ""} | Thành tiền: ${cols[4] || ""}`;
+    tr.appendChild(td);
+
+    // Tính tổng
+    const sl = parseFloat((cols[2]||"0").replace(/[^0-9.-]/g,""))||0;
+    const tien = parseFloat((cols[4]||"0").replace(/[^0-9.-]/g,""))||0;
     tongSL += sl;
-    tr.appendChild(tdSL);
-
-    const tdDonGia = document.createElement("td");
-    tdDonGia.textContent = cols[3] || "";
-    tr.appendChild(tdDonGia);
-
-    const tdThanhTien = document.createElement("td");
-    tdThanhTien.textContent = cols[4] || "";
-    const tien = parseFloat(cols[4].replace(/[^0-9.-]/g,""))||0;
     tongTien += tien;
-    tr.appendChild(tdThanhTien);
 
     tbody.appendChild(tr);
   }
@@ -144,7 +95,6 @@ rows.forEach((r, index) => {
 
 document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
 document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN")+" VND";
-
 document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
 
 // Chọn khổ giấy
@@ -162,12 +112,12 @@ paperSelect.addEventListener("change", function(){
   else if(width==="58mm") fontSize="12px";
   else if(width==="60mm") fontSize="13px";
   else if(width==="70mm") fontSize="14px";
+
   styleEl.innerHTML = `
-    @media print {
-      body{width:${width}; margin:0; font-size:${fontSize};}
-      table{font-size:${fontSize};}
-    }
-  `;
+  @media print{
+    body{width:${width}; margin:0; font-size:${fontSize};}
+    table{font-size:${fontSize};}
+  }`;
 });
 </script>
 </body>
