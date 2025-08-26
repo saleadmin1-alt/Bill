@@ -18,6 +18,7 @@
   <table id="billTable">
     <thead>
       <tr>
+        <th>STT</th>
         <th>Mã hàng</th>
         <th>Tên hàng</th>
         <th>ĐVT</th>
@@ -53,15 +54,23 @@
     const rows = data.split("_n_"); // tách các dòng
 
     const tbody = document.querySelector("#billTable tbody");
-    rows.forEach(r => {
+    rows.forEach((r, index) => {
       if (r.trim() !== "") {
         const cols = r.split("|"); // tách cột theo dấu |
         const tr = document.createElement("tr");
+
+        // Cột STT
+        const tdStt = document.createElement("td");
+        tdStt.textContent = index + 1;
+        tr.appendChild(tdStt);
+
+        // Các cột dữ liệu
         cols.forEach(c => {
           const td = document.createElement("td");
           td.textContent = c;
           tr.appendChild(td);
         });
+
         tbody.appendChild(tr);
       }
     });
