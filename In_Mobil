@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Hóa đơn bán hàng</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive -->
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 10px; 
+      font-size: 14px; 
+    }
+    h2 { 
+      text-align: center; 
+      font-size: 18px; 
+      margin-bottom: 10px; 
+    }
+    #info p { margin: 2px 0; font-size: 14px; }
+
+    table { 
+      border-collapse: collapse; 
+      width: 100%; 
+      margin-top: 10px; 
+      font-size: 13px; 
+    }
+    th, td { 
+      border: 1px solid #333; 
+      padding: 5px; 
+      text-align: center; 
+      word-wrap: break-word;
+    }
+    th { background: #f2f2f2; }
+    .total-row td { font-weight: bold; }
+
+    /* Nút in */
+    #printBtn {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+    #printBtn:active {
+      background: #0056b3;
+    }
+
+    /* Khi in ẩn nút */
+    @media print {
+      #printBtn { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <h2>HÓA ĐƠN BÁN HÀNG</h2>
+  <div id="info"></div>
+  <table id="billTable">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Mã hàng</th>
+        <th>Tên hàng</th>
+        <th>ĐVT</th>
+        <th>SL</th>
+        <th>Đơn giá</th>
+        <th>Thành tiền</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="4">TỔNG CỘNG</td>
+        <td id="tongSlCell">0</td>
+        <td></td>
+        <td id="tongTienCell">0</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Nút In -->
+  <button id="printBtn" onclick="window.print()">🖨 In</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+
+    const id = params.get("id") || "";
+    const ten = decodeURIComponent(params.get("ten") || "");
+    const diachi = decodeURIComponent(params.get("diachi") || "");
+
+    document.getElementById("info").innerHTML = `
+      <p><b>Mã đơn hàng:</b> ${id}</p>
+      <p><b>Khách hàng:</b> ${ten}</p>
+      <p><b>Địa chỉ:</b> ${diachi}</p>
+    `;
+
+    const data = decodeURIComponent(params.get("data") || "");
+    const rows = data.split("_n_"); 
+
+    const tbody = document.querySelector("#billTable tbody");
+    let tongTien = 0;
+    let tongSL = 0;
+
+    rows.forEach((r, index) => {
+      if (r.trim() !== "") {
+        const cols = r.split("|"); 
+        const tr = document.createElement("tr");
+
+        // STT
+        const tdStt = document.createElement("td");
+        tdStt.textContent = index + 1;
+        tr.appendChild(tdStt);
+
+        cols.forEach((c, i) => {
+          const td = document.createElement("td");
+          td.textContent = c;
+
+          if (i === 3) { // SL
+            const sl = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
+            tongSL += sl;
+          }
+
+          if (i === 5) { // Thành tiền
+            const val = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
+            tongTien += val;
+          }
+
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      }
+    });
+
+    document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
+    document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
+
+    document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
+  </script>
+</body>
+</html>
