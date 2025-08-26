@@ -1,132 +1,143 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Hóa đơn bán hàng</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      font-size: 14px;
-    }
-    h2 {
-      text-align: center;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-    #info p { margin: 2px 0; font-size: 14px; }
+<meta charset="UTF-8">
+<title>Hóa đơn bán hàng</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 5px;
+  font-size: 12px;
+}
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 10px;
-      font-size: 13px;
-    }
-    th, td {
-      padding: 5px;
-      text-align: left;
-      word-wrap: break-word;
-      border: none; /* bỏ viền */
-    }
-    .product-name { font-weight: bold; }
+/* Tiêu đề */
+h2 { text-align: center; font-size: 16px; margin-bottom: 5px; }
+#info p { margin: 2px 0; font-size: 12px; }
 
-    .total-row td { font-weight: bold; }
+/* Bảng sản phẩm */
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+td { border: none; padding: 2px 4px; word-wrap: break-word; font-size: 12px; }
+.total-row td { font-weight: bold; text-align: right; }
 
-    /* Nút in */
-    #printBtn {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-    }
-    #printBtn:active { background: #0056b3; }
+/* STT + Tên hàng */
+.item-name { font-weight: bold; display: block; margin-bottom: 2px; }
 
-    /* Khi in ẩn nút */
-    @media print {
-      #printBtn { display: none; }
-      body { width: 550mm; margin: 0; }
-    }
-  </style>
+/* SL – Đơn giá – Thành tiền */
+.item-detail { display: flex; justify-content: space-between; font-size: 11px; }
+
+/* Nút in và chọn khổ giấy */
+#printBtn { position: fixed; bottom: 10px; right: 10px; background: #007bff; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+#printBtn:active { background: #0056b3; }
+label { font-size: 12px; }
+#paperWidth { font-size: 12px; margin-left: 5px; }
+
+/* In ấn */
+@media print {
+  body { width: 207px; margin:0; font-size:10px; } /* 55mm ≈ 207px @96dpi */
+  #printBtn, #paperWidth, label { display: none; }
+  table { font-size: 10px; }
+}
+</style>
 </head>
 <body>
-  <h2>HÓA ĐƠN BÁN HÀNG</h2>
-  <div id="info"></div>
 
-  <table id="billTable">
-    <thead>
-      <tr>
-        <th>STT</th>
-        <th>Tên hàng / Chi tiết</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr class="total-row">
-        <td>TỔNG CỘNG</td>
-        <td id="tongCell">0</td>
-      </tr>
-    </tfoot>
-  </table>
+<h2>HÓA ĐƠN BÁN HÀNG</h2>
 
-  <button id="printBtn" onclick="window.print()">🖨 In</button>
+<label for="paperWidth">Chọn khổ giấy:</label>
+<select id="paperWidth">
+  <option value="55mm" selected>55mm</option>
+  <option value="58mm">58mm</option>
+  <option value="60mm">60mm</option>
+  <option value="70mm">70mm</option>
+</select>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id") || "";
-    const ten = decodeURIComponent(params.get("ten") || "");
-    const diachi = decodeURIComponent(params.get("diachi") || "");
+<div id="info"></div>
 
-    document.getElementById("info").innerHTML = `
-      <p><b>Mã đơn hàng:</b> ${id}</p>
-      <p><b>Khách hàng:</b> ${ten}</p>
-      <p><b>Địa chỉ:</b> ${diachi}</p>
-    `;
+<table id="billTable">
+  <tbody></tbody>
+  <tfoot>
+    <tr class="total-row">
+      <td>TỔNG CỘNG</td>
+      <td id="tongSlCell"></td>
+      <td id="tongTienCell"></td>
+    </tr>
+  </tfoot>
+</table>
 
-    const data = decodeURIComponent(params.get("data") || "");
-    const rows = data.split("_n_");
+<button id="printBtn" onclick="window.print()">🖨 In</button>
 
-    const tbody = document.querySelector("#billTable tbody");
-    let tongSL = 0;
-    let tongTien = 0;
+<script>
+// Lấy thông tin từ URL
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id") || "";
+const ten = decodeURIComponent(params.get("ten") || "");
+const diachi = decodeURIComponent(params.get("diachi") || "");
+document.getElementById("info").innerHTML = `
+<p><b>Mã đơn hàng:</b> ${id}</p>
+<p><b>Khách hàng:</b> ${ten}</p>
+<p><b>Địa chỉ:</b> ${diachi}</p>
+`;
 
-    rows.forEach((r, index) => {
-      if (r.trim() !== "") {
-        const cols = r.split("|"); // [Tên hàng, SL, Đơn giá, Thành tiền]
-        const tr = document.createElement("tr");
+// Dữ liệu sản phẩm
+const data = decodeURIComponent(params.get("data") || "");
+const rows = data.split("_n_");
+const tbody = document.querySelector("#billTable tbody");
+let tongSL=0, tongTien=0;
 
-        // STT
-        const tdStt = document.createElement("td");
-        tdStt.textContent = index + 1;
-        tr.appendChild(tdStt);
+rows.forEach((r,index)=>{
+  if(r.trim()!==""){
+    const cols = r.split("|");
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
 
-        // Tên hàng + chi tiết SL, ĐG, TT
-        const tdDetail = document.createElement("td");
-        tdDetail.innerHTML = `
-          <span class="product-name">${cols[0]}</span><br>
-          SL: ${cols[1]} | Đơn giá: ${cols[2]} | Thành tiền: ${cols[3]}
-        `;
-        tr.appendChild(tdDetail);
+    td.innerHTML = `<span class="item-name">${index+1}. ${cols[1]||""}</span>
+                    <div class="item-detail">
+                      <span>SL: ${cols[2]||""}</span>
+                      <span>ĐG: ${cols[3]||""}</span>
+                      <span>TT: ${cols[4]||""}</span>
+                    </div>`;
+    tr.appendChild(td);
 
-        // Cộng tổng
-        const slVal = parseFloat(cols[1].replace(/[^0-9.-]/g,"")) || 0;
-        const ttVal = parseFloat(cols[3].replace(/[^0-9.-]/g,"")) || 0;
-        tongSL += slVal;
-        tongTien += ttVal;
+    // Tính tổng
+    const sl = parseFloat((cols[2]||"0").replace(/[^0-9.-]/g,""))||0;
+    const tien = parseFloat((cols[4]||"0").replace(/[^0-9.-]/g,""))||0;
+    tongSL += sl;
+    tongTien += tien;
 
-        tbody.appendChild(tr);
-      }
-    });
+    tbody.appendChild(tr);
+  }
+});
 
-    document.getElementById("tongCell").textContent = 
-      `Tổng SL: ${tongSL.toLocaleString("vi-VN")} | Tổng tiền: ${tongTien.toLocaleString("vi-VN")} VND`;
-  </script>
+document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
+document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN")+" VND";
+document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
+
+// Chọn khổ giấy
+const paperSelect = document.getElementById("paperWidth");
+paperSelect.addEventListener("change", function(){
+  const width = this.value;
+  let styleEl = document.getElementById("printWidthStyle");
+  if(!styleEl){
+    styleEl = document.createElement("style");
+    styleEl.id = "printWidthStyle";
+    document.head.appendChild(styleEl);
+  }
+  let fontSize = "10px";
+  let pxWidth = 207; // mặc định 55mm
+  if(width==="55mm"){ fontSize="10px"; pxWidth=207; }
+  else if(width==="58mm"){ fontSize="11px"; pxWidth=217; }
+  else if(width==="60mm"){ fontSize="12px"; pxWidth=226; }
+  else if(width==="70mm"){ fontSize="14px"; pxWidth=264; }
+
+  styleEl.innerHTML = `
+    @media print{
+      body{width:${pxWidth}px; margin:0; font-size:${fontSize};}
+      table{font-size:${fontSize};}
+    }`;
+});
+</script>
+
 </body>
 </html>
