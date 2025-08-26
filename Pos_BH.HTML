@@ -4,22 +4,15 @@
   <meta charset="UTF-8">
   <title>Hóa đơn bán hàng</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f8f8f8; }
-    .invoice { 
-      max-width: 700px; 
-      margin: 20px auto; 
-      background: #fff; 
-      border: 1px solid #ddd; 
-      padding: 20px; 
-      border-radius: 8px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    .invoice { max-width: 600px; margin: auto; background: #fff; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
     h1 { text-align: center; margin-bottom: 10px; }
-    .info p { margin: 3px 0; }
+    .info p { margin: 4px 0; }
     table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #f2f2f2; }
-    .total { text-align: right; font-weight: bold; margin-top: 10px; }
-    .barcode { text-align: center; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #eee; }
+    .total { text-align: right; font-weight: bold; }
+    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #555; }
     @media print {
       button { display: none; }
       body { background: #fff; }
@@ -28,68 +21,58 @@
 </head>
 <body>
   <div class="invoice">
-    <h1>HÓA ĐƠN BÁN HÀNG</h1>
+    <h1>🧾 HÓA ĐƠN BÁN HÀNG</h1>
+
     <div class="info">
       <p><strong>Mã đơn hàng:</strong> <span id="id"></span></p>
-      <p><strong>Khách hàng:</strong> <span id="ten"></span></p>
+      <p><strong>Tên khách hàng:</strong> <span id="ten"></span></p>
       <p><strong>Địa chỉ:</strong> <span id="diachi"></span></p>
-      <p><strong>Tổng SL:</strong> <span id="soluong"></span></p>
+      <p><strong>Số lượng:</strong> <span id="soluong"></span></p>
     </div>
 
-    <table id="productTable">
+    <table>
       <thead>
         <tr>
+          <th>Mã SP</th>
           <th>Sản phẩm</th>
           <th>Số lượng</th>
           <th>Đơn giá</th>
           <th>Thành tiền</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Sản phẩm sẽ được render tự động -->
+      <tbody id="product-list">
       </tbody>
     </table>
 
-    <p class="total">Tổng tiền: <span id="tongtien"></span> ₫</p>
+    <p class="total">Tổng tiền: <span id="tongtien"></span> đ</p>
 
-    <div class="barcode">
-      <img id="barcode" alt="barcode" />
+    <button onclick="window.print()">🖨 In hóa đơn</button>
+
+    <div class="footer">
+      Cảm ơn quý khách đã mua hàng!
     </div>
-
-    <button onclick="window.print()">🖨️ In hóa đơn</button>
   </div>
 
   <script>
     function getQueryParams() {
       const params = new URLSearchParams(window.location.search);
 
+      // Thông tin chung
       document.getElementById("id").textContent = params.get("id") || "";
       document.getElementById("ten").textContent = params.get("ten") || "";
       document.getElementById("diachi").textContent = params.get("diachi") || "";
       document.getElementById("soluong").textContent = params.get("soluong") || "";
       document.getElementById("tongtien").textContent = params.get("tongtien") || "";
 
-      // Tạo mã vạch
-      const id = params.get("id") || "";
-      document.getElementById("barcode").src = 
-        "https://quickchart.io/chart?cht=barcode&chs=350x100&type=code128&color=000000&backgroundColor=ffffff&chl=" + id;
-
-      // Render danh sách sản phẩm
-      const data = params.get("data");
+      // Data sản phẩm (dùng _b_ để phân tách trong AppSheet)
+      let data = params.get("data");
       if (data) {
-        const rows = data.split("_b_"); // tách theo ký hiệu bạn thay thế trong CONCATENATE
-        const tbody = document.querySelector("#productTable tbody");
-        rows.forEach((r, i) => {
-          if (r.trim() !== "") {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${r}</td>
-              <td>1</td>
-              <td></td>
-              <td></td>
-            `;
-            tbody.appendChild(tr);
-          }
+        let products = decodeURIComponent(data).split("_b_");
+        let tbody = document.getElementById("product-list");
+        products.forEach(p => {
+          let row = document.createElement("tr");
+          row.innerHTML = `<td>${p}</td><td>1</td><td></td><td></td>`;
+          tbody.appendChild(row);
         });
       }
     }
