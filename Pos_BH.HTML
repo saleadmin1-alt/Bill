@@ -9,7 +9,7 @@
     table { border-collapse: collapse; width: 100%; margin-top: 10px; }
     th, td { border: 1px solid #333; padding: 6px; text-align: center; }
     th { background: #eee; }
-    .total { font-weight: bold; }
+    .total-row td { font-weight: bold; }
   </style>
 </head>
 <body>
@@ -28,19 +28,21 @@
       </tr>
     </thead>
     <tbody></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="6">TỔNG CỘNG</td>
+        <td id="tongTienCell">0</td>
+      </tr>
+    </tfoot>
   </table>
-  <h3 id="total"></h3>
 
   <script>
-    // Lấy query string từ URL
     const params = new URLSearchParams(window.location.search);
 
-    // Hiển thị thông tin khách hàng
     const id = params.get("id") || "";
     const ten = decodeURIComponent(params.get("ten") || "");
     const diachi = decodeURIComponent(params.get("diachi") || "");
     const soluong = params.get("soluong") || "0";
-    const tongtien = params.get("tongtien") || "0";
 
     document.getElementById("info").innerHTML = `
       <p><b>Mã đơn hàng:</b> ${id}</p>
@@ -49,25 +51,31 @@
       <p><b>Tổng SL:</b> ${soluong}</p>
     `;
 
-    // Xử lý data (các dòng sản phẩm)
     const data = decodeURIComponent(params.get("data") || "");
-    const rows = data.split("_n_"); // tách các dòng
+    const rows = data.split("_n_"); 
 
     const tbody = document.querySelector("#billTable tbody");
+    let tongTien = 0;
+
     rows.forEach((r, index) => {
       if (r.trim() !== "") {
-        const cols = r.split("|"); // tách cột theo dấu |
+        const cols = r.split("|"); 
         const tr = document.createElement("tr");
 
-        // Cột STT
         const tdStt = document.createElement("td");
         tdStt.textContent = index + 1;
         tr.appendChild(tdStt);
 
-        // Các cột dữ liệu
-        cols.forEach(c => {
+        cols.forEach((c, i) => {
           const td = document.createElement("td");
           td.textContent = c;
+
+          // Nếu là cột Thành tiền (cột cuối cùng)
+          if (i === 5) {
+            const val = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
+            tongTien += val;
+          }
+
           tr.appendChild(td);
         });
 
@@ -75,8 +83,8 @@
       }
     });
 
-    // Hiển thị tổng tiền
-    document.getElementById("total").textContent = "Tổng tiền: " + tongtien + " VND";
+    // Gán tổng tiền vào ô cuối bảng
+    document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
   </script>
 </body>
 </html>
