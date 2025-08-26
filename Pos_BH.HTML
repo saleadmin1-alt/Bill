@@ -10,10 +10,27 @@
     th, td { border: 1px solid #333; padding: 6px; text-align: center; }
     th { background: #eee; }
     .total-row td { font-weight: bold; }
+    .print-btn {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .print-btn:hover { background: #0056b3; }
+    @media print {
+      .print-btn { display: none; } /* Ẩn nút khi in */
+    }
   </style>
 </head>
 <body>
   <h2>HÓA ĐƠN BÁN HÀNG</h2>
+  <button class="print-btn" onclick="window.print()">🖨 In hóa đơn</button>
+
   <div id="info"></div>
   <table id="billTable">
     <thead>
@@ -63,7 +80,6 @@
         const cols = r.split("|"); 
         const tr = document.createElement("tr");
 
-        // Thêm cột STT
         const tdStt = document.createElement("td");
         tdStt.textContent = index + 1;
         tr.appendChild(tdStt);
@@ -72,13 +88,11 @@
           const td = document.createElement("td");
           td.textContent = c;
 
-          // Cột Số lượng (index 3)
           if (i === 3) {
             const sl = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
             tongSL += sl;
           }
 
-          // Cột Thành tiền (index 5)
           if (i === 5) {
             const val = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
             tongTien += val;
@@ -91,11 +105,8 @@
       }
     });
 
-    // Gán tổng số lượng + tổng tiền
     document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
     document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
-
-    // Hiện thêm thông tin Tổng SL
     document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
   </script>
 </body>
