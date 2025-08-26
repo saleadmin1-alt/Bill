@@ -2,82 +2,66 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Hóa đơn bán hàng</title>
+  <title>Hóa đơn</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    .invoice { max-width: 600px; margin: auto; background: #fff; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-    h1 { text-align: center; margin-bottom: 10px; }
-    .info p { margin: 4px 0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #eee; }
-    .total { text-align: right; font-weight: bold; }
-    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #555; }
-    @media print {
-      button { display: none; }
-      body { background: #fff; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    .info { margin-bottom: 20px; }
+    .products { border-collapse: collapse; width: 100%; }
+    .products th, .products td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
     }
+    .products th { background: #f4f4f4; }
   </style>
 </head>
 <body>
-  <div class="invoice">
-    <h1>🧾 HÓA ĐƠN BÁN HÀNG</h1>
-
-    <div class="info">
-      <p><strong>Mã đơn hàng:</strong> <span id="id"></span></p>
-      <p><strong>Tên khách hàng:</strong> <span id="ten"></span></p>
-      <p><strong>Địa chỉ:</strong> <span id="diachi"></span></p>
-      <p><strong>Số lượng:</strong> <span id="soluong"></span></p>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Mã SP</th>
-          <th>Sản phẩm</th>
-          <th>Số lượng</th>
-          <th>Đơn giá</th>
-          <th>Thành tiền</th>
-        </tr>
-      </thead>
-      <tbody id="product-list">
-      </tbody>
-    </table>
-
-    <p class="total">Tổng tiền: <span id="tongtien"></span> đ</p>
-
-    <button onclick="window.print()">🖨 In hóa đơn</button>
-
-    <div class="footer">
-      Cảm ơn quý khách đã mua hàng!
-    </div>
+  <h2>🧾 Hóa đơn bán hàng</h2>
+  <div class="info">
+    <p><b>Mã đơn hàng:</b> <span id="id"></span></p>
+    <p><b>Tên khách hàng:</b> <span id="ten"></span></p>
+    <p><b>Địa chỉ:</b> <span id="diachi"></span></p>
+    <p><b>Số lượng:</b> <span id="soluong"></span></p>
+    <p><b>Tổng tiền:</b> <span id="tongtien"></span></p>
+    <p><b>Mã QR đơn hàng:</b> <span id="codonhang"></span></p>
+    <p><b>Thanh toán:</b> <span id="codthanhtoan"></span></p>
   </div>
 
+  <h3>Chi tiết sản phẩm</h3>
+  <table class="products">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Mã chi tiết</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+
   <script>
-    function getQueryParams() {
-      const params = new URLSearchParams(window.location.search);
+    // Lấy query params từ URL
+    const params = new URLSearchParams(window.location.search);
 
-      // Thông tin chung
-      document.getElementById("id").textContent = params.get("id") || "";
-      document.getElementById("ten").textContent = params.get("ten") || "";
-      document.getElementById("diachi").textContent = params.get("diachi") || "";
-      document.getElementById("soluong").textContent = params.get("soluong") || "";
-      document.getElementById("tongtien").textContent = params.get("tongtien") || "";
+    // Hiển thị thông tin chung
+    document.getElementById("id").textContent = params.get("id") || "";
+    document.getElementById("ten").textContent = decodeURIComponent(params.get("ten") || "");
+    document.getElementById("diachi").textContent = decodeURIComponent(params.get("diachi") || "");
+    document.getElementById("soluong").textContent = params.get("soluong") || "";
+    document.getElementById("tongtien").textContent = params.get("tongtien") || "";
+    document.getElementById("codonhang").textContent = params.get("codonhang") || "";
+    document.getElementById("codthanhtoan").textContent = params.get("codthanhtoan") || "";
 
-      // Data sản phẩm (dùng _b_ để phân tách trong AppSheet)
-      let data = params.get("data");
-      if (data) {
-        let products = decodeURIComponent(data).split("_b_");
-        let tbody = document.getElementById("product-list");
-        products.forEach(p => {
-          let row = document.createElement("tr");
-          row.innerHTML = `<td>${p}</td><td>1</td><td></td><td></td>`;
-          tbody.appendChild(row);
-        });
-      }
-    }
+    // Xử lý danh sách chi tiết
+    const rawData = decodeURIComponent(params.get("data") || "");
+    const items = rawData.split("_b_").filter(x => x.trim() !== "");
 
-    window.onload = getQueryParams;
+    const tbody = document.getElementById("list");
+    items.forEach((item, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${i + 1}</td><td>${item}</td>`;
+      tbody.appendChild(tr);
+    });
   </script>
 </body>
 </html>
