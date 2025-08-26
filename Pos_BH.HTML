@@ -30,7 +30,9 @@
     <tbody></tbody>
     <tfoot>
       <tr class="total-row">
-        <td colspan="6">TỔNG CỘNG</td>
+        <td colspan="4">TỔNG CỘNG</td>
+        <td id="tongSlCell">0</td>
+        <td></td>
         <td id="tongTienCell">0</td>
       </tr>
     </tfoot>
@@ -42,13 +44,11 @@
     const id = params.get("id") || "";
     const ten = decodeURIComponent(params.get("ten") || "");
     const diachi = decodeURIComponent(params.get("diachi") || "");
-    const soluong = params.get("soluong") || "0";
 
     document.getElementById("info").innerHTML = `
       <p><b>Mã đơn hàng:</b> ${id}</p>
       <p><b>Khách hàng:</b> ${ten}</p>
       <p><b>Địa chỉ:</b> ${diachi}</p>
-      <p><b>Tổng SL:</b> ${soluong}</p>
     `;
 
     const data = decodeURIComponent(params.get("data") || "");
@@ -56,12 +56,14 @@
 
     const tbody = document.querySelector("#billTable tbody");
     let tongTien = 0;
+    let tongSL = 0;
 
     rows.forEach((r, index) => {
       if (r.trim() !== "") {
         const cols = r.split("|"); 
         const tr = document.createElement("tr");
 
+        // Thêm cột STT
         const tdStt = document.createElement("td");
         tdStt.textContent = index + 1;
         tr.appendChild(tdStt);
@@ -70,7 +72,13 @@
           const td = document.createElement("td");
           td.textContent = c;
 
-          // Nếu là cột Thành tiền (cột cuối cùng)
+          // Cột Số lượng (index 3)
+          if (i === 3) {
+            const sl = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
+            tongSL += sl;
+          }
+
+          // Cột Thành tiền (index 5)
           if (i === 5) {
             const val = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
             tongTien += val;
@@ -83,8 +91,12 @@
       }
     });
 
-    // Gán tổng tiền vào ô cuối bảng
+    // Gán tổng số lượng + tổng tiền
+    document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
     document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
+
+    // Hiện thêm thông tin Tổng SL
+    document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
   </script>
 </body>
 </html>
