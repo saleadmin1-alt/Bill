@@ -3,18 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>Hóa đơn bán hàng</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { 
       font-family: Arial, sans-serif; 
       margin: 10px; 
       font-size: 14px; 
     }
-    h2 { 
-      text-align: center; 
-      font-size: 18px; 
-      margin-bottom: 10px; 
-    }
+    h2 { text-align: center; font-size: 18px; margin-bottom: 10px; }
     #info p { margin: 2px 0; font-size: 14px; }
 
     table { 
@@ -22,17 +18,17 @@
       width: 100%; 
       margin-top: 10px; 
       font-size: 13px; 
+      table-layout: fixed; /* Giúp co vừa khổ giấy */
     }
     th, td { 
       border: 1px solid #333; 
-      padding: 5px; 
+      padding: 3px 5px; 
       text-align: center; 
       word-wrap: break-word;
     }
     th { background: #f2f2f2; }
     .total-row td { font-weight: bold; }
 
-    /* Nút in */
     #printBtn {
       position: fixed;
       bottom: 15px;
@@ -40,24 +36,37 @@
       background: #007bff;
       color: white;
       border: none;
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
       box-shadow: 0 3px 6px rgba(0,0,0,0.2);
     }
-    #printBtn:active {
-      background: #0056b3;
-    }
+    #printBtn:active { background: #0056b3; }
 
-    /* Khi in ẩn nút */
+    label { font-size: 14px; }
+    #paperWidth { font-size: 14px; margin-left: 5px; }
+
+    /* Khổ giấy in mặc định */
     @media print {
-      #printBtn { display: none; }
+      body { width: 58mm; margin: 0; font-size: 12px; }
+      #printBtn, #paperWidth, label { display: none; }
+      table { font-size: 12px; }
     }
   </style>
 </head>
 <body>
   <h2>HÓA ĐƠN BÁN HÀNG</h2>
+
+  <!-- Chọn khổ giấy -->
+  <label for="paperWidth">Chọn khổ giấy:</label>
+  <select id="paperWidth">
+    <option value="55mm">55mm</option>
+    <option value="58mm" selected>58mm</option>
+    <option value="60mm">60mm</option>
+    <option value="70mm">70mm</option>
+  </select>
+
   <div id="info"></div>
   <table id="billTable">
     <thead>
@@ -82,7 +91,6 @@
     </tfoot>
   </table>
 
-  <!-- Nút In -->
   <button id="printBtn" onclick="window.print()">🖨 In</button>
 
   <script>
@@ -140,6 +148,30 @@
     document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
 
     document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
+
+    // ---- Xử lý thay đổi khổ giấy ----
+    const paperSelect = document.getElementById("paperWidth");
+    paperSelect.addEventListener("change", function() {
+      const width = this.value;
+      let styleEl = document.getElementById("printWidthStyle");
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = "printWidthStyle";
+        document.head.appendChild(styleEl);
+      }
+      let fontSize = "12px";
+      if (width === "55mm") fontSize = "10px";
+      else if (width === "58mm") fontSize = "12px";
+      else if (width === "60mm") fontSize = "13px";
+      else if (width === "70mm") fontSize = "14px";
+
+      styleEl.innerHTML = `
+        @media print {
+          body { width: ${width}; margin: 0; font-size: ${fontSize}; }
+          table { font-size: ${fontSize}; }
+        }
+      `;
+    });
   </script>
 </body>
 </html>
