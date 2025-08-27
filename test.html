@@ -5,7 +5,8 @@
   <title>Hóa đơn bán hàng</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    h2 { text-align: center; }
+    h2 { text-align: center; margin-bottom: 5px; }
+    .barcode-box { text-align: center; margin-bottom: 15px; }
     table { border-collapse: collapse; width: 100%; margin-top: 10px; }
     th, td { border: 1px solid #333; padding: 6px; text-align: center; }
     th { background: #eee; }
@@ -31,6 +32,10 @@
 </head>
 <body>
   <h2>HÓA ĐƠN BÁN HÀNG</h2>
+  <div class="barcode-box">
+    <img id="barcode" alt="Mã vạch đơn hàng">
+  </div>
+
   <button class="print-btn" onclick="window.print()">🖨 In hóa đơn</button>
 
   <div id="info"></div>
@@ -68,9 +73,15 @@
     const thanhtoan = decodeURIComponent(params.get("thanhtoan") || "0");
 
     // Lấy thông tin VietQR từ URL (AppSheet truyền sang)
-    const bankCode = params.get("bank") || "";        // Mã ngân hàng
-    const accountNumber = params.get("stk") || "";    // Số tài khoản
-    const accountName = decodeURIComponent(params.get("chutk") || ""); // Tên chủ TK
+    const bankCode = params.get("bank") || "";        
+    const accountNumber = params.get("stk") || "";    
+    const accountName = decodeURIComponent(params.get("chutk") || ""); 
+
+    // Hiển thị mã vạch theo Mã đơn hàng
+    if (id) {
+      document.getElementById("barcode").src =
+        "https://barcode.tec-it.com/barcode.ashx?code=Code128&translate-esc=on&data=" + encodeURIComponent(id);
+    }
 
     document.getElementById("info").innerHTML = `
       <p><b>Mã đơn hàng:</b> ${id}</p>
@@ -124,7 +135,7 @@
     if (thanhtoan !== "0" && bankCode && accountNumber) {
       const qrUrl = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact.jpg?amount=${thanhtoan}&addInfo=CK%20${encodeURIComponent(ten)}&accountName=${encodeURIComponent(accountName)}`;
       document.getElementById("qrcode").innerHTML = `
-        <p><b>QR Code Thanh toán VietQR</b></p>
+        <p><b>QR Code Thanh toán</b></p>
         <img src="${qrUrl}" alt="QR Thanh toán">
       `;
     }
