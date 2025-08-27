@@ -3,77 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <title>Hóa đơn bán hàng</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 10px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-    .store-header {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    .store-name {
-      margin: 0;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .store-info {
-      margin: 2px 0;
-      font-size: 14px;
-    }
-    .invoice-title {
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: bold;
-      text-transform: uppercase;
-      border-top: 1px dashed #000;
-      border-bottom: 1px dashed #000;
-      padding: 5px 0;
-    }
-    .barcode-box, .qr-box {
-      text-align: center;
-      margin: 10px 0;
-    }
-    .barcode-box img { max-width: 100%; height: auto; }
-    .qr-box img { width: 200px; height: 200px; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { text-align: center; margin-bottom: 5px; }
+    .store-header { text-align: center; margin-bottom: 10px; }
+    .store-header p { margin: 2px 0; }
+    .barcode-box { text-align: center; margin-bottom: 15px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #333; padding: 6px; text-align: center; }
+    th { background: #eee; }
+    .total-row td { font-weight: bold; }
     .print-btn {
       display: block;
       margin: 10px auto;
-      padding: 8px 16px;
-      font-size: 14px;
+      padding: 10px 20px;
+      font-size: 16px;
       background: #007bff;
       color: #fff;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
     }
     .print-btn:hover { background: #0056b3; }
-    .product-item {
-      border-bottom: 1px dashed #999;
-      padding: 6px 0;
-    }
-    .product-item p { margin: 2px 0; }
-    .total-box {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: right;
-    }
+    .qr-box { text-align: center; margin-top: 15px; }
+    .qr-box img { width: 220px; height: 220px; }
     @media print {
-      body { margin: 5mm; font-size: 12px; }
-      .print-btn { display: none; }
-      .qr-box img { width: 160px; height: 160px; }
+      .print-btn { display: none; } /* Ẩn nút khi in */
     }
   </style>
 </head>
 <body>
+  <!-- Phần header cửa hàng -->
   <div class="store-header">
-    <h2 id="storeName" class="store-name"></h2>
-    <p id="storeAddress" class="store-info"></p>
-    <p id="storePhone" class="store-info"></p>
-    <h2 class="invoice-title">HÓA ĐƠN BÁN HÀNG</h2>
+    <h2 id="storeName"></h2>
+    <p id="storeAddress"></p>
+    <p id="storePhone"></p>
+    <p id="orderId"></p>
+    <h2>HÓA ĐƠN BÁN HÀNG</h2>
   </div>
 
   <div class="barcode-box">
@@ -83,86 +49,110 @@
   <button class="print-btn" onclick="window.print()">🖨 In hóa đơn</button>
 
   <div id="info"></div>
-
-  <div id="productList"></div>
-
-  <div class="total-box">
-    <p>TỔNG SL: <span id="tongSlCell">0</span></p>
-    <p>TỔNG CỘNG: <span id="tongTienCell">0</span> VND</p>
-  </div>
+  <table id="billTable">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Mã hàng</th>
+        <th>Tên hàng</th>
+        <th>ĐVT</th>
+        <th>Số lượng</th>
+        <th>Đơn giá</th>
+        <th>Thành tiền</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="4">TỔNG CỘNG</td>
+        <td id="tongSlCell">0</td>
+        <td></td>
+        <td id="tongTienCell">0</td>
+      </tr>
+    </tfoot>
+  </table>
 
   <div id="qrcode" class="qr-box"></div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
 
-    const tencuahang = decodeURIComponent(params.get("tencuahang") || "");
-    const diachicuahang = decodeURIComponent(params.get("diachicuahang") || "");
-    const dienthoaicuahang = decodeURIComponent(params.get("dienthoaicuahang") || "");
+    // Thông tin cửa hàng
+    const tenCuaHang = decodeURIComponent(params.get("cuahang") || "Cửa hàng chưa đặt tên");
+    const diaChiCH = decodeURIComponent(params.get("diachicuahang") || "");
+    const dienThoaiCH = decodeURIComponent(params.get("dienthoaicuahang") || "");
+    const maDonHang = params.get("id") || "";
 
-    const id = params.get("id") || "";
+    document.getElementById("storeName").textContent = tenCuaHang;
+    document.getElementById("storeAddress").textContent = "Địa chỉ: " + diaChiCH;
+    document.getElementById("storePhone").textContent = "SĐT: " + dienThoaiCH;
+    document.getElementById("orderId").textContent = "Mã HĐ: " + maDonHang;
+
+    // Thông tin khách hàng
     const ten = decodeURIComponent(params.get("ten") || "");
     const diachi = decodeURIComponent(params.get("diachi") || "");
     const thanhtoan = decodeURIComponent(params.get("thanhtoan") || "0");
 
-    const bankCode = params.get("bank") || "";
-    const accountNumber = params.get("stk") || "";
-    const accountName = decodeURIComponent(params.get("chutk") || "");
+    // Lấy thông tin VietQR từ URL
+    const bankCode = params.get("bank") || "";        
+    const accountNumber = params.get("stk") || "";    
+    const accountName = decodeURIComponent(params.get("chutk") || ""); 
 
-    // header
-    document.getElementById("storeName").textContent = tencuahang;
-    document.getElementById("storeAddress").textContent = "Địa chỉ: " + diachicuahang;
-    document.getElementById("storePhone").textContent = "SĐT: " + dienthoaicuahang;
-
-    // barcode
-    if (id) {
+    // Hiển thị mã vạch theo Mã đơn hàng
+    if (maDonHang) {
       document.getElementById("barcode").src =
-        "https://barcode.tec-it.com/barcode.ashx?code=Code128&translate-esc=on&data=" + encodeURIComponent(id);
+        "https://barcode.tec-it.com/barcode.ashx?code=Code128&translate-esc=on&data=" + encodeURIComponent(maDonHang);
     }
 
-    // thông tin khách
     document.getElementById("info").innerHTML = `
-      <p><b>Mã đơn hàng:</b> ${id}</p>
       <p><b>Khách hàng:</b> ${ten}</p>
       <p><b>Địa chỉ:</b> ${diachi}</p>
       <p><b>Số tiền thanh toán:</b> ${Number(thanhtoan).toLocaleString("vi-VN")} VND</p>
     `;
 
-    // sản phẩm
+    // Dữ liệu sản phẩm
     const data = decodeURIComponent(params.get("data") || "");
-    const rows = data.split("_n_");
-    const listDiv = document.getElementById("productList");
+    const rows = data.split("_n_"); 
 
+    const tbody = document.querySelector("#billTable tbody");
     let tongTien = 0;
     let tongSL = 0;
 
     rows.forEach((r, index) => {
       if (r.trim() !== "") {
-        const cols = r.split("|");
+        const cols = r.split("|"); 
+        const tr = document.createElement("tr");
 
-        const maHang = cols[0] || "";
-        const tenHang = cols[1] || "";
-        const soLuong = parseFloat((cols[3] || "0").replace(/[^0-9.-]/g, "")) || 0;
-        const donGia = parseFloat((cols[4] || "0").replace(/[^0-9.-]/g, "")) || 0;
-        const thanhTien = parseFloat((cols[5] || "0").replace(/[^0-9.-]/g, "")) || 0;
+        const tdStt = document.createElement("td");
+        tdStt.textContent = index + 1;
+        tr.appendChild(tdStt);
 
-        tongSL += soLuong;
-        tongTien += thanhTien;
+        cols.forEach((c, i) => {
+          const td = document.createElement("td");
+          td.textContent = c;
 
-        const itemHtml = `
-          <div class="product-item">
-            <p><b>${index + 1}. ${tenHang}</b></p>
-            <p>SL: ${soLuong} | Đơn giá: ${donGia.toLocaleString("vi-VN")} | Thành tiền: ${thanhTien.toLocaleString("vi-VN")}</p>
-          </div>
-        `;
-        listDiv.innerHTML += itemHtml;
+          if (i === 3) {
+            const sl = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
+            tongSL += sl;
+          }
+
+          if (i === 5) {
+            const val = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
+            tongTien += val;
+          }
+
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
       }
     });
 
     document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
-    document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN");
+    document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
+    document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
 
-    // QR Code
+    // QR Code VietQR
     if (thanhtoan !== "0" && bankCode && accountNumber) {
       const qrUrl = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact.jpg?amount=${thanhtoan}&addInfo=CK%20${encodeURIComponent(ten)}&accountName=${encodeURIComponent(accountName)}`;
       document.getElementById("qrcode").innerHTML = `
