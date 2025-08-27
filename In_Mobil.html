@@ -123,7 +123,7 @@
         const itemHtml = `
           <div class="product-item">
             <p><b>${index + 1}. ${tenHang}</b></p>
-            <p>SL: ${soLuong} | Đơn giá: ${donGia.toLocaleString("vi-VN")} | Thành tiền: ${thanhTien.toLocaleString("vi-VN")}</p>
+            <p> ${soLuong} x ${donGia.toLocaleString("vi-VN")}: ${thanhTien.toLocaleString("vi-VN")}</p>
           </div>
         `;
         listDiv.innerHTML += itemHtml;
