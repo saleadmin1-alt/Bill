@@ -6,7 +6,8 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     h2 { text-align: center; margin-bottom: 5px; }
-    .barcode-box { text-align: center; margin-bottom: 15px; }
+    .store-info { text-align: center; margin-bottom: 10px; }
+    .barcode-box { text-align: center; margin: 10px 0; }
     table { border-collapse: collapse; width: 100%; margin-top: 10px; }
     th, td { border: 1px solid #333; padding: 6px; text-align: center; }
     th { background: #eee; }
@@ -26,19 +27,32 @@
     .qr-box { text-align: center; margin-top: 15px; }
     .qr-box img { width: 220px; height: 220px; }
     @media print {
-      .print-btn { display: none; } /* Ẩn nút khi in */
+      .print-btn { display: none; }
     }
   </style>
 </head>
 <body>
+  <!-- Thông tin cửa hàng -->
+  <div class="store-info">
+    <div id="storeName"><b>Cửa hàng chưa đặt tên</b></div>
+    <div id="storeAddress">Địa chỉ:</div>
+    <div id="storePhone">SĐT:</div>
+  </div>
+
   <h2>HÓA ĐƠN BÁN HÀNG</h2>
+
   <div class="barcode-box">
     <img id="barcode" alt="Mã vạch đơn hàng">
   </div>
 
+  
+
   <button class="print-btn" onclick="window.print()">🖨 In hóa đơn</button>
 
+  <!-- Thông tin khách hàng -->
   <div id="info"></div>
+
+  <!-- Bảng sản phẩm -->
   <table id="billTable">
     <thead>
       <tr>
@@ -61,37 +75,49 @@
       </tr>
     </tfoot>
   </table>
+ <div class="footer">
+    Xin cảm ơn quý khách và hẹn gặp lại!
+  </div>
 
+  <!-- QR thanh toán -->
   <div id="qrcode" class="qr-box"></div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
 
+    // Thông tin cửa hàng
+    document.getElementById("storeName").textContent = params.get("tencuahang") || "Cửa hàng chưa đặt tên";
+    document.getElementById("storeAddress").textContent = "Địa chỉ: " + (params.get("diachicuahang") || "");
+    document.getElementById("storePhone").textContent = "SĐT: " + (params.get("dienthoaicuahang") || "");
+
+    // Hóa đơn & khách hàng
     const id = params.get("id") || "";
     const ten = decodeURIComponent(params.get("ten") || "");
     const diachi = decodeURIComponent(params.get("diachi") || "");
     const thanhtoan = decodeURIComponent(params.get("thanhtoan") || "0");
 
-    // Lấy thông tin VietQR từ URL (AppSheet truyền sang)
+    // VietQR
     const bankCode = params.get("bank") || "";        
     const accountNumber = params.get("stk") || "";    
     const accountName = decodeURIComponent(params.get("chutk") || ""); 
 
-    // Hiển thị mã vạch theo Mã đơn hàng
+    // Mã vạch
     if (id) {
       document.getElementById("barcode").src =
         "https://barcode.tec-it.com/barcode.ashx?code=Code128&translate-esc=on&data=" + encodeURIComponent(id);
+      document.getElementById("invoiceId").textContent = id;
     }
 
+    // Thông tin khách hàng
     document.getElementById("info").innerHTML = `
-        <p><b>Khách hàng:</b> ${ten}</p>
+      <p><b>Khách hàng:</b> ${ten}</p>
       <p><b>Địa chỉ:</b> ${diachi}</p>
       <p><b>Số tiền thanh toán:</b> ${Number(thanhtoan).toLocaleString("vi-VN")} VND</p>
     `;
 
+    // Sản phẩm
     const data = decodeURIComponent(params.get("data") || "");
     const rows = data.split("_n_"); 
-
     const tbody = document.querySelector("#billTable tbody");
     let tongTien = 0;
     let tongSL = 0;
@@ -109,12 +135,12 @@
           const td = document.createElement("td");
           td.textContent = c;
 
-          if (i === 3) {
+          if (i === 4) { // số lượng
             const sl = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
             tongSL += sl;
           }
 
-          if (i === 5) {
+          if (i === 6) { // thành tiền
             const val = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
             tongTien += val;
           }
@@ -128,7 +154,6 @@
 
     document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
     document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
-    document.getElementById("info").innerHTML += `<p><b>Tổng SL:</b> ${tongSL}</p>`;
 
     // QR Code VietQR
     if (thanhtoan !== "0" && bankCode && accountNumber) {
