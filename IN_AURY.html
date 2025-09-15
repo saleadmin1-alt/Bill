@@ -8,27 +8,29 @@
   size: 6cm 4cm;   /* khổ giấy: rộng 6cm, cao 4cm */
   margin: 0;       /* bỏ lề */
 }
-    }
+    
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
     }
 
+    
 
 
     .page {
   width: 6cm;
   height: 4cm;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  page-break-after: always; /* mỗi nhãn = 1 trang */
+  justify-content: center;   /* canh ngang giữa */
+  align-items: center;       /* canh dọc giữa */
+  page-break-after: always;
 }
     
-    .barcode-item {
-      text-align: center;
-    }
+   .barcode-item {
+  text-align: center;        /* canh chữ giữa */
+  width: 100%;               /* chiếm hết chiều rộng để dễ canh */
+}
    .label {
   font-size: 10px;
   font-weight: normal;
