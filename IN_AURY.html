@@ -27,24 +27,27 @@
   page-break-after: always;
 }
     
-  .barcode-item {
-  text-align: center;        /* canh chữ giữa */
+ .barcode-item {
+  text-align: center;  
   width: 100%;
 }
    .label {
   font-size: 9px;
   font-weight: normal;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
+  text-align: center;
 }
 svg {
   width: 4cm;
   height: 1.6cm;
-  margin-bottom: 0;
+  margin: 0 auto;   /* ép barcode nằm giữa */
   display: block;
 }
 .code {
-  font-size: 13px;
-  margin-top: 1px;  /* khoảng cách rất nhỏ */
+  font-size: 12px;
+  margin-top: 1px;
+  display: block;
+  text-align: center;   /* canh giữa số */
 }
     #printBtn {
       display: block;
