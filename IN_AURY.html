@@ -18,12 +18,13 @@
     
 
 
-  .page {
+ .page {
   width: 5cm;
   height: 3cm;
   display: flex;
-  justify-content: center;   /* canh ngang giữa */
-  align-items: center;       /* canh dọc giữa */
+  flex-direction: column;   /* sắp xếp theo cột */
+  justify-content: center;  /* canh giữa theo chiều dọc */
+  align-items: center;      /* canh giữa theo chiều ngang */
   page-break-after: always;
 }
     
@@ -31,24 +32,33 @@
   text-align: center;  
   width: 100%;
 }
-   .label {
-  font-size: 8px;
-  font-weight: normal;
+  
+
+
+    .label {
+  font-size: 9px;
   margin-bottom: 2px;
   text-align: center;
 }
+
 svg {
   width: 4cm;
   height: 1.6cm;
   margin: 0 auto;   /* ép barcode nằm giữa */
   display: block;
 }
+
+
+    
+
 .code {
   font-size: 12px;
-  margin-top: 1px;
-  display: block;
-  text-align: center;   /* canh giữa số */
+  margin-top: 2px;
+  text-align: center;
 }
+
+
+    
     #printBtn {
       display: block;
       margin: 10px auto;
