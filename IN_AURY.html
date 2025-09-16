@@ -1,128 +1,37 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>In Barcode</title>
-  <style>
-    @page {
-      size: 6cm 4cm;   /* khổ giấy */
-      margin: 0;       /* bỏ lề */
-    }
-    
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const rawData = params.get("data");
 
-    .page {
-      width: 6cm;
-      height: 4cm;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;   /* đẩy nội dung xuống dưới */
-      align-items: center;         /* canh giữa ngang */
-      page-break-after: always;
-      padding-bottom: 3px;         /* chừa khoảng cách mép dưới */
-    }
-    
-    .barcode-item {
-      text-align: center;  
-      width: 100%;
-    }
+  if (rawData) {
+    const container = document.getElementById("container");
+    const items = rawData.split("_n_");
 
-    .label {
-      font-size: 9px;
-      font-weight: bold;
-      margin-bottom: 2px;
-      text-align: center;
-    }
+    items.forEach((item, index) => {
+      const parts = item.split(/ *- */);  // sửa ở đây
+      if (parts.length >= 2) {
+        const productName = parts.slice(0, parts.length - 1).join(" - ").trim();
+        const barcodeValue = parts[parts.length - 1].trim();
 
-    .sub-label {
-      font-size: 9px;
-      font-style: italic;
-      margin-bottom: 2px;
-      text-align: center;
-    }
+        const page = document.createElement("div");
+        page.className = "page";
 
-    svg {
-      width: 5cm;
-      height: 1.6cm;
-      margin: 0 auto;
-      display: block;
-    }
+        page.innerHTML = `
+          <div class="barcode-item">
+            <div class="label">${productName}</div>
+            <svg id="barcode${index}"></svg>
+            <div class="code">${barcodeValue}</div>
+          </div>
+        `;
 
-    .code {
-      font-size: 12px;
-      margin-top: 2px;
-      text-align: center;
-    }
+        container.appendChild(page);
 
-    #printBtn {
-      display: block;
-      margin: 10px auto;
-      padding: 6px 12px;
-      font-size: 13px;
-      cursor: pointer;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-    }
-
-    @media print {
-      #printBtn { display: none; }
-      .page {
-        height: 100%;
+        JsBarcode(`#barcode${index}`, barcodeValue, {
+          format: "CODE128",
+          displayValue: false
+        });
       }
-    }
-  </style>
-</head>
-<body>
-
-  <button id="printBtn" onclick="window.print()">🖨 In</button>
-
-  <div id="container"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const rawData = params.get("data");
-
-    if (rawData) {
-      const container = document.getElementById("container");
-      const items = rawData.split("_n_");
-
-      items.forEach((item, index) => {
-        const parts = item.split(" - ");
-        if (parts.length >= 2) {
-          const nameAndAttr = parts[0].split("_");   // tách theo "_"
-          const productName = nameAndAttr[0].trim(); // tên sản phẩm
-          const productAttr = nameAndAttr[1] ? nameAndAttr[1].trim() : ""; // thuộc tính
-          const barcodeValue = parts[1].trim();      // mã barcode
-
-          const page = document.createElement("div");
-          page.className = "page";
-
-          page.innerHTML = `
-            <div class="barcode-item">
-              <div class="label">${productName}</div>
-              ${productAttr ? `<div class="sub-label">${productAttr}</div>` : ""}
-              <svg id="barcode${index}"></svg>
-              <div class="code">${barcodeValue}</div>
-            </div>
-          `;
-
-          container.appendChild(page);
-
-          JsBarcode(`#barcode${index}`, barcodeValue, {
-            format: "CODE128",
-            displayValue: false
-          });
-        }
-      });
-    }
-  </script>
-
-</body>
-</html>
+    });
+  } else {
+    document.getElementById("container").innerHTML = "<p style='text-align:center;color:red'>❌ Không có dữ liệu</p>";
+  }
+</script>
