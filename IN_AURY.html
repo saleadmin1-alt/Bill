@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>In Barcode</title>
   <style>
-   @page {
-  size: 6cm 4cm;   /* khổ giấy: rộng 6cm, cao 4cm */
-  margin: 0;       /* bỏ lề */
-}
+    @page {
+      size: 6cm 4cm;   /* khổ giấy */
+      margin: 0;       /* bỏ lề */
+    }
     
     body {
       font-family: Arial, sans-serif;
@@ -15,51 +15,41 @@
       padding: 0;
     }
 
+    .page {
+      width: 6cm;
+      height: 4cm;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;   /* đẩy nội dung xuống dưới */
+      align-items: center;         /* canh giữa ngang */
+      page-break-after: always;
+      padding-bottom: 3px;         /* chừa khoảng cách mép dưới */
+    }
     
-
-
-.page {
-  width: 6cm;
-  height: 4cm;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;   /* đẩy nội dung xuống dưới */
-  align-items: center;         /* canh giữa ngang */
-  page-break-after: always;
-  padding-bottom: 3px;         /* chừa 1 chút khoảng cách mép dưới */
-}
-    
- .barcode-item {
-  text-align: center;  
-  width: 100%;
-}
-  
-
+    .barcode-item {
+      text-align: center;  
+      width: 100%;
+    }
 
     .label {
-  font-size: 9px;
-  margin-bottom: 2px;
-  text-align: center;
-}
+      font-size: 9px;
+      margin-bottom: 2px;
+      text-align: center;
+    }
 
-svg {
-  width: 5cm;
-  height: 1.6cm;
-  margin: 0 auto;   /* ép barcode nằm giữa */
-  display: block;
-}
+    svg {
+      width: 5cm;
+      height: 1.6cm;
+      margin: 0 auto;
+      display: block;
+    }
 
+    .code {
+      font-size: 12px;
+      margin-top: 2px;
+      text-align: center;
+    }
 
-    
-
-.code {
-  font-size: 12px;
-  margin-top: 2px;
-  text-align: center;
-}
-
-
-    
     #printBtn {
       display: block;
       margin: 10px auto;
@@ -71,6 +61,7 @@ svg {
       border: none;
       border-radius: 4px;
     }
+
     @media print {
       #printBtn { display: none; }
       .page {
