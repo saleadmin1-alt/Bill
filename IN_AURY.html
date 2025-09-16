@@ -5,16 +5,14 @@
   <title>In Barcode</title>
   <style>
     @page {
-      size: 6cm 4cm;   /* khổ giấy */
-      margin: 0;       /* bỏ lề */
+      size: 6cm 4cm;
+      margin: 0;
     }
-    
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
     }
-
     .page {
       width: 6cm;
       height: 4cm;
@@ -25,39 +23,29 @@
       page-break-after: always;
       padding-bottom: 3px;
     }
-    
     .barcode-item {
-      text-align: center;  
+      text-align: center;
       width: 100%;
     }
-
-    .label {
+    .line {
       font-size: 9px;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+    .line:first-child {
       font-weight: bold;
-      margin-bottom: 2px;
-      text-align: center;
     }
-
-    .sub-label {
-      font-size: 9px;
-      font-style: italic;
-      margin-bottom: 2px;
-      text-align: center;
-    }
-
     svg {
       width: 5cm;
       height: 1.6cm;
       margin: 0 auto;
       display: block;
     }
-
     .code {
       font-size: 12px;
       margin-top: 2px;
       text-align: center;
     }
-
     #printBtn {
       display: block;
       margin: 10px auto;
@@ -69,19 +57,15 @@
       border: none;
       border-radius: 4px;
     }
-
     @media print {
       #printBtn { display: none; }
-      .page {
-        height: 100%;
-      }
+      .page { height: 100%; }
     }
   </style>
 </head>
 <body>
 
   <button id="printBtn" onclick="window.print()">🖨 In ngay</button>
-
   <div id="container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
@@ -94,24 +78,24 @@
       const items = rawData.split("_n_");
 
       items.forEach((item, index) => {
-        const parts = item.split(/ *- */);  // tách theo dấu '-'
+        const parts = item.split(/ *- */); // tách theo dấu '-'
         if (parts.length >= 2) {
-          const productName = parts[0].trim();         // Dòng 1
-          const attribute  = parts.slice(1, -1).join(" - ").trim(); // Dòng 2
-          const barcodeValue = parts[parts.length - 1].trim();      // Barcode
+          const barcodeValue = parts.pop().trim(); // phần cuối cùng là barcode
+          const lines = parts.map(p => p.trim());  // các phần còn lại -> dòng chữ
 
           const page = document.createElement("div");
           page.className = "page";
 
-          page.innerHTML = `
-            <div class="barcode-item">
-              <div class="label">${productName}</div>
-              <div class="sub-label">${attribute}</div>
+          let html = `<div class="barcode-item">`;
+          lines.forEach(line => {
+            html += `<div class="line">${line}</div>`;
+          });
+          html += `
               <svg id="barcode${index}"></svg>
               <div class="code">${barcodeValue}</div>
-            </div>
-          `;
+            </div>`;
 
+          page.innerHTML = html;
           container.appendChild(page);
 
           JsBarcode(`#barcode${index}`, barcodeValue, {
@@ -121,9 +105,9 @@
         }
       });
     } else {
-      document.getElementById("container").innerHTML = "<p style='text-align:center;color:red'>❌ Không có dữ liệu</p>";
+      document.getElementById("container").innerHTML =
+        "<p style='text-align:center;color:red'>❌ Không có dữ liệu</p>";
     }
   </script>
-
 </body>
 </html>
