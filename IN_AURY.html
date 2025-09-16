@@ -4,62 +4,52 @@
   <meta charset="UTF-8">
   <title>In Barcode</title>
   <style>
-   @page {
-  size: 6cm 4cm;   /* khổ giấy: rộng 6cm, cao 4cm */
-  margin: 0;       /* bỏ lề */
-}
-    
+    @page {
+      size: 6cm 4cm;
+      margin: 0;
+    }
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
     }
-
-    
-
-
-.page {
-  width: 6cm;
-  height: 4cm;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;   /* đẩy nội dung xuống dưới */
-  align-items: center;         /* canh giữa ngang */
-  page-break-after: always;
-  padding-bottom: 3px;         /* chừa 1 chút khoảng cách mép dưới */
-}
-    
- .barcode-item {
-  text-align: center;  
-  width: 100%;
-}
-  
-
-
+    .page {
+      width: 6cm;
+      height: 4cm;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      page-break-after: always;
+      padding-bottom: 3px;
+    }
+    .barcode-item {
+      text-align: center;
+      width: 100%;
+    }
     .label {
-  font-size: 9px;
-  margin-bottom: 2px;
-  text-align: center;
-}
-
-svg {
-  width: 5cm;
-  height: 1.6cm;
-  margin: 0 auto;   /* ép barcode nằm giữa */
-  display: block;
-}
-
-
-    
-
-.code {
-  font-size: 12px;
-  margin-top: 2px;
-  text-align: center;
-}
-
-
-    
+      font-size: 9px;
+      margin-bottom: 2px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .sub-label {
+      font-size: 8px;
+      margin-bottom: 2px;
+      text-align: center;
+      font-style: italic;
+    }
+    svg {
+      width: 5cm;
+      height: 1.6cm;
+      margin: 0 auto;
+      display: block;
+    }
+    .code {
+      font-size: 12px;
+      margin-top: 2px;
+      text-align: center;
+    }
     #printBtn {
       display: block;
       margin: 10px auto;
@@ -73,16 +63,13 @@ svg {
     }
     @media print {
       #printBtn { display: none; }
-      .page {
-        height: 100%;
-      }
+      .page { height: 100%; }
     }
   </style>
 </head>
 <body>
 
   <button id="printBtn" onclick="window.print()">🖨 In ngay</button>
-
   <div id="container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
@@ -96,9 +83,10 @@ svg {
 
       items.forEach((item, index) => {
         const parts = item.split(" - ");
-        if (parts.length >= 2) {
-          const productName = parts.slice(0, parts.length - 1).join(" - ").trim();
-          const barcodeValue = parts[parts.length - 1].trim();
+        if (parts.length >= 3) {
+          const productName = parts[0].trim();          // tên sản phẩm
+          const productAttr = parts[1].trim();          // thuộc tính (kích thước)
+          const barcodeValue = parts[2].trim();         // mã barcode
 
           const page = document.createElement("div");
           page.className = "page";
@@ -106,6 +94,7 @@ svg {
           page.innerHTML = `
             <div class="barcode-item">
               <div class="label">${productName}</div>
+              <div class="sub-label">${productAttr}</div>
               <svg id="barcode${index}"></svg>
               <div class="code">${barcodeValue}</div>
             </div>
