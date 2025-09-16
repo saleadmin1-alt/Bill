@@ -33,7 +33,10 @@
       text-align: center;
     }
     .line:first-child {
-      font-weight: bold;
+      font-weight: bold; /* dòng 1 in đậm */
+    }
+    .italic-line {
+      font-style: italic; /* dòng nghiêng */
     }
     svg {
       width: 5cm;
@@ -79,18 +82,21 @@
       const items = rawData.split("_n_");
 
       items.forEach((item, index) => {
-        // Tách thành các phần theo dấu underscore
         const parts = item.split("_").map(p => p.trim()).filter(p => p !== "");
         if (parts.length >= 2) {
-          const barcodeValue = parts.pop(); // phần cuối là barcode
-          const lines = parts; // các phần trước thành các dòng
+          const barcodeValue = parts.pop(); 
+          const lines = parts;
 
           const page = document.createElement("div");
           page.className = "page";
 
           let html = `<div class="barcode-item">`;
           lines.forEach((lineText, i) => {
-            html += `<div class="line">${lineText}</div>`;
+            if (i === 2) {
+              html += `<div class="line italic-line">${lineText}</div>`;
+            } else {
+              html += `<div class="line">${lineText}</div>`;
+            }
           });
           html += `
               <svg id="barcode${index}"></svg>
