@@ -20,10 +20,10 @@
       height: 4cm;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;   /* đẩy nội dung xuống dưới */
-      align-items: center;         /* canh giữa ngang */
+      justify-content: flex-end;
+      align-items: center;
       page-break-after: always;
-      padding-bottom: 3px;         /* chừa khoảng cách mép dưới */
+      padding-bottom: 3px;
     }
     
     .barcode-item {
@@ -86,42 +86,44 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
   <script>
-  const params = new URLSearchParams(window.location.search);
-  const rawData = params.get("data");
+    const params = new URLSearchParams(window.location.search);
+    const rawData = params.get("data");
 
-  if (rawData) {
-    const container = document.getElementById("container");
-    const items = rawData.split("_n_");
+    if (rawData) {
+      const container = document.getElementById("container");
+      const items = rawData.split("_n_");
 
-    items.forEach((item, index) => {
-      const parts = item.split(/ *- */);  // sửa ở đây
-      if (parts.length >= 2) {
-        const productName = parts.slice(0, parts.length - 1).join(" - ").trim();
-        const barcodeValue = parts[parts.length - 1].trim();
+      items.forEach((item, index) => {
+        const parts = item.split(/ *- */);  // tách theo dấu '-'
+        if (parts.length >= 2) {
+          const productName = parts[0].trim();         // Dòng 1
+          const attribute  = parts.slice(1, -1).join(" - ").trim(); // Dòng 2
+          const barcodeValue = parts[parts.length - 1].trim();      // Barcode
 
-        const page = document.createElement("div");
-        page.className = "page";
+          const page = document.createElement("div");
+          page.className = "page";
 
-        page.innerHTML = `
-          <div class="barcode-item">
-            <div class="label">${productName}</div>
-            <svg id="barcode${index}"></svg>
-            <div class="code">${barcodeValue}</div>
-          </div>
-        `;
+          page.innerHTML = `
+            <div class="barcode-item">
+              <div class="label">${productName}</div>
+              <div class="sub-label">${attribute}</div>
+              <svg id="barcode${index}"></svg>
+              <div class="code">${barcodeValue}</div>
+            </div>
+          `;
 
-        container.appendChild(page);
+          container.appendChild(page);
 
-        JsBarcode(`#barcode${index}`, barcodeValue, {
-          format: "CODE128",
-          displayValue: false
-        });
-      }
-    });
-  } else {
-    document.getElementById("container").innerHTML = "<p style='text-align:center;color:red'>❌ Không có dữ liệu</p>";
-  }
-</script>
+          JsBarcode(`#barcode${index}`, barcodeValue, {
+            format: "CODE128",
+            displayValue: false
+          });
+        }
+      });
+    } else {
+      document.getElementById("container").innerHTML = "<p style='text-align:center;color:red'>❌ Không có dữ liệu</p>";
+    }
+  </script>
 
 </body>
 </html>
