@@ -18,14 +18,15 @@
     
 
 
- .page {
+.page {
   width: 5cm;
   height: 3cm;
   display: flex;
-  flex-direction: column;   /* sắp xếp theo cột */
-  justify-content: center;  /* canh giữa theo chiều dọc */
-  align-items: center;      /* canh giữa theo chiều ngang */
+  flex-direction: column;
+  justify-content: flex-end;   /* đẩy nội dung xuống dưới */
+  align-items: center;         /* canh giữa ngang */
   page-break-after: always;
+  padding-bottom: 3px;         /* chừa 1 chút khoảng cách mép dưới */
 }
     
  .barcode-item {
