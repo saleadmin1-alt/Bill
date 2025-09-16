@@ -66,6 +66,7 @@
 <body>
 
   <button id="printBtn" onclick="window.print()">🖨 In ngay</button>
+
   <div id="container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
@@ -78,17 +79,18 @@
       const items = rawData.split("_n_");
 
       items.forEach((item, index) => {
-        const parts = item.split(/ *- */); // tách theo dấu '-'
+        // Tách thành các phần theo dấu underscore
+        const parts = item.split("_").map(p => p.trim()).filter(p => p !== "");
         if (parts.length >= 2) {
-          const barcodeValue = parts.pop().trim(); // phần cuối cùng là barcode
-          const lines = parts.map(p => p.trim());  // các phần còn lại -> dòng chữ
+          const barcodeValue = parts.pop(); // phần cuối là barcode
+          const lines = parts; // các phần trước thành các dòng
 
           const page = document.createElement("div");
           page.className = "page";
 
           let html = `<div class="barcode-item">`;
-          lines.forEach(line => {
-            html += `<div class="line">${line}</div>`;
+          lines.forEach((lineText, i) => {
+            html += `<div class="line">${lineText}</div>`;
           });
           html += `
               <svg id="barcode${index}"></svg>
@@ -106,7 +108,7 @@
       });
     } else {
       document.getElementById("container").innerHTML =
-        "<p style='text-align:center;color:red'>❌ Không có dữ liệu</p>";
+        "<p style='text-align:center;color:red'>❌ Không có dữ liệu để in</p>";
     }
   </script>
 </body>
