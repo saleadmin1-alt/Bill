@@ -1,4 +1,91 @@
-<script>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>In Barcode</title>
+  <style>
+    @page {
+      size: 6cm 4cm;   /* khổ giấy */
+      margin: 0;       /* bỏ lề */
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .page {
+      width: 6cm;
+      height: 4cm;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;   /* đẩy nội dung xuống dưới */
+      align-items: center;         /* canh giữa ngang */
+      page-break-after: always;
+      padding-bottom: 3px;         /* chừa khoảng cách mép dưới */
+    }
+    
+    .barcode-item {
+      text-align: center;  
+      width: 100%;
+    }
+
+    .label {
+      font-size: 9px;
+      font-weight: bold;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+
+    .sub-label {
+      font-size: 9px;
+      font-style: italic;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+
+    svg {
+      width: 5cm;
+      height: 1.6cm;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .code {
+      font-size: 12px;
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    #printBtn {
+      display: block;
+      margin: 10px auto;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    @media print {
+      #printBtn { display: none; }
+      .page {
+        height: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button id="printBtn" onclick="window.print()">🖨 In ngay</button>
+
+  <div id="container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script>
   const params = new URLSearchParams(window.location.search);
   const rawData = params.get("data");
 
@@ -35,3 +122,6 @@
     document.getElementById("container").innerHTML = "<p style='text-align:center;color:red'>❌ Không có dữ liệu</p>";
   }
 </script>
+
+</body>
+</html>
