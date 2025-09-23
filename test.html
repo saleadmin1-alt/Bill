@@ -3,7 +3,6 @@
 async function exportFromTemplate() {
   // Link file template trên GitHub (RAW link)
   const url = "https://raw.githubusercontent.com/saleadmin1-alt/bill-template/main/template.xlsx";
- 
 
   // Load template
   const response = await fetch(url);
@@ -32,21 +31,21 @@ async function exportFromTemplate() {
   const rows = data.split("_n_");
 
   // ---- Ghi dữ liệu vào template ----
+  sheet.cell("B3").value(storeName);
+  sheet.cell("B4").value(storeAddr);
+  sheet.cell("B5").value(storePhone);
 
-  sheet.cell("F6").value("" + orderId);
-  sheet.cell("C9").value("" + customer);
-  sheet.cell("c11").value("" + custAddr);
-  sheet.cell("c12").value("" + custAddr);
-  sheet.cell("c13").value("" + custAddr);
-  sheet.cell("c14").value("" + custAddr);
-  sheet.cell("c15").value("" + custAddr);
+  sheet.cell("B7").value("Mã đơn hàng: " + orderId);
+  sheet.cell("B8").value("Khách hàng: " + customer);
+  sheet.cell("B9").value("Địa chỉ: " + custAddr);
+  sheet.cell("B10").value("Thanh toán: " + Number(totalPay).toLocaleString("vi-VN") + " VND");
 
-
-  
-  sheet.cell("B20").value("" + Number(totalPay).toLocaleString("vi-VN") + " VND");
+  sheet.cell("E6").value("Ngân hàng: " + bank);
+  sheet.cell("E7").value("STK: " + account);
+  sheet.cell("E8").value("Chủ TK: " + accountName);
 
   // Đổ sản phẩm vào bảng (giả sử bảng bắt đầu từ dòng 12)
-  let startRow = 18;
+  let startRow = 12;
   rows.forEach((r, i) => {
     if (r.trim() !== "") {
       const cols = r.split("|");
