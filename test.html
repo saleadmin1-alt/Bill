@@ -64,11 +64,15 @@ async function exportFromTemplate() {
   });
 // Dòng tiếp theo sau sản phẩm
 let totalRow = startRow + rows.length + 2;
+  sheet.cell("A" + totalRow+1).value("Tổng tiền hàng chưa bao gồm VAT:");
   sheet.cell("E"+ totalRow+1).value("" + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
-sheet.cell("E" + totalRow+2).value(Number(thanhtoanchuaVAT || 0));
-sheet.cell("E" + (totalRow + 3)).value(Number(thue || 0));
-sheet.cell("E" + (totalRow + 4)).value(Number(tongthanhtoan || 0));
-sheet.cell("E" + (totalRow + 5)).value(Number(datamung || 0));
+  sheet.cell("A" + totalRow+2).value("Tiền thuế GTGT :");
+sheet.cell("E" + (totalRow + 2)).value(Number(thue || 0));
+  sheet.cell("A" + totalRow+3).value("Tổng thanh toán:");
+sheet.cell("E" + (totalRow + 3)).value(Number(tongthanhtoan || 0));
+  sheet.cell("A" + totalRow+4).value("Đã tạm ứng:");
+sheet.cell("E" + (totalRow +4)).value(Number(datamung || 0));
+  sheet.cell("A" + totalRow+5).value("Số tiền thanh toán còn lại:");
 sheet.cell("E" + (totalRow + 6)).value(Number(conlai || 0));
   // Xuất file
   workbook.outputAsync().then(function(blob) {
