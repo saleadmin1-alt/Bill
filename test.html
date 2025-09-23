@@ -1,27 +1,78 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-async function exportFromTemplate() {
-  // Link RAW đúng của GitHub
+async function exportExcel() {
+  const params = new URLSearchParams(window.location.search);
+
+  // Lấy params
+  const storeName = params.get("tencuahang") || "Cửa hàng chưa đặt tên";
+  const storeAddress = params.get("diachicuahang") || "";
+  const storePhone = params.get("dienthoaicuahang") || "";
+  const id = params.get("id") || "";
+  const ten = decodeURIComponent(params.get("ten") || "");
+  const diachi = decodeURIComponent(params.get("diachi") || "");
+  const thanhtoan = decodeURIComponent(params.get("thanhtoan") || "0");
+  const bankCode = params.get("bank") || "";
+  const accountNumber = params.get("stk") || "";
+  const accountName = decodeURIComponent(params.get("chutk") || "");
+
+  // Parse sản phẩm
+  const data = decodeURIComponent(params.get("data") || "");
+  const rows = data.split("_n_"); 
+  let products = [];
+  rows.forEach((r, index) => {
+    if (r.trim() !== "") {
+      const cols = r.split("|"); 
+      products.push([
+        index+1,
+        cols[0] || "",
+        cols[1] || "",
+        cols[2] || "",
+        cols[3] || "",
+        cols[4] || "",
+        cols[5] || ""
+      ]);
+    }
+  });
+
+  // 🔹 Link tới template.xlsx trên GitHub (thay <username>/<repo>)
   const url = "https://raw.githubusercontent.com/saleadmin1-alt/bill-template/main/template.xlsx";
 
-  // Tải template về
+  // Đọc template
   const response = await fetch(url);
   const arrayBuffer = await response.arrayBuffer();
   const wb = XLSX.read(arrayBuffer, { type: "array" });
+  const ws = wb.Sheets[wb.SheetNames[0]]; // sheet đầu tiên trong template
 
-  // Lấy sheet đầu tiên
-  const ws = wb.Sheets[wb.SheetNames[0]];
+  // ---- Gán dữ liệu vào template ----
+  ws["E2"] = { t: "s", v: storeName };
+  ws["E3"] = { t: "s", v: storeAddress };
+  ws["$4"] = { t: "s", v: storePhone };
 
-  // ---- Gán dữ liệu động vào template ----
-  ws["C8"] = { t: "s", v: "Khách hàng: Nguyễn Văn A" };
-  ws["C9"] = { t: "s", v: "Địa chỉ: 123 Quận 3 HCM" };
-  ws["E12"] = { t: "n", v: 3 };        // Số lượng
-  ws["F12"] = { t: "n", v: 150000 };   // Đơn giá
-  ws["G12"] = { t: "n", v: 450000 };   // Thành tiền
+  ws["C8"] = { t: "s", v: id };
+  ws["C9"] = { t: "s", v: ten };
+  ws["C10"] = { t: "s", v: diachi };
+  ws["E8"] = { t: "s", v: Number(thanhtoan).toLocaleString("vi-VN")+" VND" };
+
+  ws["B10"] = { t: "s", v: bankCode };
+  ws["B11"] = { t: "s", v: accountNumber };
+  ws["B12"] = { t: "s", v: accountName };
+
+  // Ghi sản phẩm bắt đầu từ dòng 15 (tùy template của bạn)
+  let startRow = 15;
+  products.forEach((p, i) => {
+    const row = startRow + i;
+    ws["A"+row] = { t: "n", v: p[0] };
+    ws["B"+row] = { t: "s", v: p[1] };
+    ws["C"+row] = { t: "s", v: p[2] };
+    ws["D"+row] = { t: "s", v: p[3] };
+    ws["E"+row] = { t: "n", v: Number(p[4]) || 0 };
+    ws["F"+row] = { t: "n", v: Number(p[5]) || 0 };
+    ws["G"+row] = { t: "n", v: Number(p[6]) || 0 };
+  });
 
   // Xuất file
-  XLSX.writeFile(wb, "DonHang.xlsx");
+  XLSX.writeFile(wb, "XacNhanDonHang_" + id + ".xlsx");
 }
 </script>
 
-<button onclick="exportFromTemplate()">📥 Xuất Excel từ Template</button>
+<button class="print-btn" onclick="exportExcel()">📥 Xuất Excel</button>
