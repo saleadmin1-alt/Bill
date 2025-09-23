@@ -1,7 +1,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-function exportExcel() {
-  const wb = XLSX.utils.book_new();
+async function exportExcel() {
   const params = new URLSearchParams(window.location.search);
 
   // Lấy params
@@ -19,11 +18,11 @@ function exportExcel() {
   // Parse sản phẩm
   const data = decodeURIComponent(params.get("data") || "");
   const rows = data.split("_n_"); 
-  let productRows = [["STT","SKU","SẢN PHẨM","ĐVT","SỐ LƯỢNG","ĐƠN GIÁ","THÀNH TIỀN"]];
+  let products = [];
   rows.forEach((r, index) => {
     if (r.trim() !== "") {
       const cols = r.split("|"); 
-      productRows.push([
+      products.push([
         index+1,
         cols[0] || "",
         cols[1] || "",
@@ -35,47 +34,43 @@ function exportExcel() {
     }
   });
 
-  // Tạo sheet chính
-  const wsData = [
-    ["CÔNG TY TNHH / CỬA HÀNG", storeName],
-    ["Địa chỉ", storeAddress],
-    ["Điện thoại", storePhone],
-    [],
-    ["XÁC NHẬN ĐƠN HÀNG"],
-    ["Mã đơn hàng:", id],
-    ["Khách hàng:", ten],
-    ["Địa chỉ KH:", diachi],
-    ["Số tiền thanh toán:", Number(thanhtoan).toLocaleString("vi-VN")+" VND"],
-    [],
-    ["TÀI KHOẢN THANH TOÁN"],
-    ["Ngân hàng", bankCode],
-    ["Số tài khoản", accountNumber],
-    ["Chủ tài khoản", accountName],
-    [],
-    ["CHI TIẾT SẢN PHẨM:"],
-    ...productRows
-  ];
+  // 🔹 Link tới template.xlsx trên GitHub (thay <username>/<repo>)
+  const url = "https://github.com/saleadmin1-alt/bill-template/blob/main/template.xlsx";
 
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  // Đọc template
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  const wb = XLSX.read(arrayBuffer, { type: "array" });
+  const ws = wb.Sheets[wb.SheetNames[0]]; // sheet đầu tiên trong template
 
-  // Merge & định dạng
-  ws['!merges'] = [
-    {s:{r:4,c:0}, e:{r:4,c:6}} // gộp dòng "XÁC NHẬN ĐƠN HÀNG"
-  ];
+  // ---- Gán dữ liệu vào template ----
+  ws["B2"] = { t: "s", v: storeName };
+  ws["B3"] = { t: "s", v: storeAddress };
+  ws["B4"] = { t: "s", v: storePhone };
 
-  // Set width cột
-  ws['!cols'] = [
-    {wch:5},  // STT
-    {wch:15}, // SKU
-    {wch:30}, // Sản phẩm
-    {wch:10}, // ĐVT
-    {wch:12}, // Số lượng
-    {wch:15}, // Đơn giá
-    {wch:18}  // Thành tiền
-  ];
+  ws["E6"] = { t: "s", v: id };
+  ws["B7"] = { t: "s", v: ten };
+  ws["B8"] = { t: "s", v: diachi };
+  ws["E8"] = { t: "s", v: Number(thanhtoan).toLocaleString("vi-VN")+" VND" };
 
-  XLSX.utils.book_append_sheet(wb, ws, "Xác nhận đơn hàng");
+  ws["B10"] = { t: "s", v: bankCode };
+  ws["B11"] = { t: "s", v: accountNumber };
+  ws["B12"] = { t: "s", v: accountName };
 
+  // Ghi sản phẩm bắt đầu từ dòng 15 (tùy template của bạn)
+  let startRow = 15;
+  products.forEach((p, i) => {
+    const row = startRow + i;
+    ws["A"+row] = { t: "n", v: p[0] };
+    ws["B"+row] = { t: "s", v: p[1] };
+    ws["C"+row] = { t: "s", v: p[2] };
+    ws["D"+row] = { t: "s", v: p[3] };
+    ws["E"+row] = { t: "n", v: Number(p[4]) || 0 };
+    ws["F"+row] = { t: "n", v: Number(p[5]) || 0 };
+    ws["G"+row] = { t: "n", v: Number(p[6]) || 0 };
+  });
+
+  // Xuất file
   XLSX.writeFile(wb, "XacNhanDonHang_" + id + ".xlsx");
 }
 </script>
