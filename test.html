@@ -1,14 +1,11 @@
 <script src="https://unpkg.com/xlsx-populate/browser/xlsx-populate.min.js"></script>
 <script>
 async function exportFromTemplate() {
-  // Link file template trên GitHub (RAW link)
   const url = "https://raw.githubusercontent.com/saleadmin1-alt/bill-template/main/template.xlsx";
 
-  // Load template
   const response = await fetch(url);
   const buffer = await response.arrayBuffer();
 
-  // Mở workbook
   const workbook = await XlsxPopulate.fromDataAsync(buffer);
   const sheet = workbook.sheet(0);
 
@@ -16,43 +13,37 @@ async function exportFromTemplate() {
   const params = new URLSearchParams(window.location.search);  
 
   const madonhang   = params.get("madonhang") || "";
-  const ngaytaodon   = params.get("ngaytaodon") || "";
-  const tencongty  = params.get("tencongty") || "";
-  const masothue     = params.get("masothue") || "";
-  const diachicuahang    = params.get("diachicuahang") || "";
-  const nguoilienhe    = params.get("nguoilienhe") || "";
-  const diachigiaohang    = params.get("diachigiaohang") || "";
-  const sodienthoai        = params.get("sodienthoai") || "";
-  const email    = params.get("email") || "";
+  const ngaytaodon  = params.get("ngaytaodon") || "";
+  const tencongty   = params.get("tencongty") || "";
+  const masothue    = params.get("masothue") || "";
+  const diachicuahang = params.get("diachicuahang") || "";
+  const nguoilienhe = params.get("nguoilienhe") || "";
+  const diachigiaohang = params.get("diachigiaohang") || "";
+  const sodienthoai = params.get("sodienthoai") || "";
+  const email       = params.get("email") || "";
   const thanhtoanchuaVAT = params.get("thanhtoanchuaVAT") || "";
-    const thue = params.get("thue") || "";
-   const tongthanhtoan = params.get("tongthanhtoan") || "";
-   const datamung = params.get("thue") || "";
-   const conlai = params.get("thue") || "";
-  
+  const thue        = params.get("thue") || "";
+  const tongthanhtoan = params.get("tongthanhtoan") || "";
+  const datamung    = params.get("datamung") || "";
+  const conlai      = params.get("conlai") || "";
 
   // Parse danh sách sản phẩm
   const data = decodeURIComponent(params.get("data") || "");
   const rows = data.split("_n_");
 
   // ---- Ghi dữ liệu vào template ----
-  
+  sheet.cell("F6").value(madonhang);
+  sheet.cell("F7").value(ngaytaodon);
 
-  sheet.cell("F6").value("" + madonhang);
-  sheet.cell("F7").value("" + ngaytaodon);
+  sheet.cell("C9").value("Khách hàng: " + tencongty);
+  sheet.cell("C10").value("Địa chỉ: " + diachicuahang);
+  sheet.cell("C11").value("MST: " + masothue);
+  sheet.cell("C12").value("Liên hệ: " + nguoilienhe + " - " + sodienthoai);
+  sheet.cell("C13").value("Email: " + email);
 
+  sheet.cell("E20").value("Thanh toán: " + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
 
-
-  
-  sheet.cell("C9").value("Khách hàng: " + customer);
-  sheet.cell("C10").value("Địa chỉ: " + custAddr);
-  sheet.cell("C11").value(storeName);
-  sheet.cell("C12").value(storeAddr);
-  sheet.cell("C13").value(storePhone);
-  
-  sheet.cell("E20").value("Thanh toán: " + Number(totalPay).toLocaleString("vi-VN") + " VND");
-
-  // Đổ sản phẩm vào bảng (giả sử bảng bắt đầu từ dòng 12)
+  // Đổ sản phẩm vào bảng (giả sử bảng bắt đầu từ dòng 18)
   let startRow = 18;
   rows.forEach((r, i) => {
     if (r.trim() !== "") {
@@ -72,7 +63,7 @@ async function exportFromTemplate() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "DonHang_" + orderId + ".xlsx";
+    a.download = "DonHang_" + madonhang + ".xlsx";
     a.click();
     window.URL.revokeObjectURL(url);
   });
