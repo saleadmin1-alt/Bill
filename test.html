@@ -52,6 +52,7 @@ rows.forEach((r, i) => {
     const cols = r.split("_");
     sheet.cell("A" + (startRow + i)).value(i + 1);          // STT
     sheet.cell("B" + (startRow + i)).value(cols[0] || ""); // SẢN PHẨM
+     sheet.cell("E" + (startRow + i)).value(Number(cols[3] || 0)); // SỐ LƯỢNG
     sheet.cell("F" + (startRow + i)).value(Number(cols[4] || 0)); // SỐ LƯỢNG
     sheet.cell("G" + (startRow + i)).value(Number(cols[5] || 0)); // ĐƠN VỊ
     sheet.cell("H" + (startRow + i)).value(Number(cols[6] || 0)); // ĐƠN GIÁ
@@ -62,7 +63,7 @@ rows.forEach((r, i) => {
 });
 
 // ✅ Tính vị trí bắt đầu phần tổng kết
-let totalRow = startRow + rows.length + 1;
+let totalRow = startRow + rows.length ;
 
 sheet.cell("B" + totalRow).value("Tổng tiền hàng chưa bao gồm VAT:");
 sheet.cell("K" + totalRow).value(Number(thanhtoanchuaVAT || 0).toLocaleString("vi-VN") + " VND");
@@ -78,6 +79,16 @@ sheet.cell("K" + (totalRow+3)).value(Number(datamung || 0).toLocaleString("vi-VN
 
 sheet.cell("B" + (totalRow+4)).value("Số tiền thanh toán còn lại:");
 sheet.cell("K" + (totalRow+4)).value(Number(conlai || 0).toLocaleString("vi-VN") + " VND");
+
+  
+  
+  sheet.cell("C" + (totalRow+9)).value("Người lập phiếu");
+   sheet.cell("C" + (totalRow+10)).value("(Ký, họ tên)");
+   sheet.cell("G" + (totalRow+9)).value("Thủ kho");
+   sheet.cell("G" + (totalRow+10)).value("(Ký, họ tên)");
+  sheet.cell("J" + (totalRow+9)).value("Người nhận hàng");
+   sheet.cell("J" + (totalRow+10)).value("(Ký, họ tên)");
+
 
 
   // Xuất file
