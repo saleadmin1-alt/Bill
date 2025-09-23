@@ -44,12 +44,12 @@ async function exportExcel() {
   const ws = wb.Sheets[wb.SheetNames[0]]; // sheet đầu tiên trong template
 
   // ---- Gán dữ liệu vào template ----
-  ws["B2"] = { t: "s", v: storeName };
+  ws["E2"] = { t: "s", v: storeName };
   ws["B3"] = { t: "s", v: storeAddress };
   ws["B4"] = { t: "s", v: storePhone };
 
-  ws["E6"] = { t: "s", v: id };
-  ws["B7"] = { t: "s", v: ten };
+  ws["C8"] = { t: "s", v: id };
+  ws["C9"] = { t: "s", v: ten };
   ws["B8"] = { t: "s", v: diachi };
   ws["E8"] = { t: "s", v: Number(thanhtoan).toLocaleString("vi-VN")+" VND" };
 
