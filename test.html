@@ -50,29 +50,37 @@ async function exportFromTemplate() {
     if (r.trim() !== "") {
       const cols = r.split("_");
       sheet.cell("A" + (startRow + i)).value(i + 1);          // STT
-      sheet.cell("B" + (startRow + i)).value(cols[0] || ""); // SKU
+      sheet.cell("B" + (startRow + i)).value(cols[0] || ""); // SẢN PHẨM
+
      
      
-      sheet.cell("F" + (startRow + i)).value(Number(cols[3] || 0)); // Đơn giá
-      sheet.cell("G" + (startRow + i)).value(Number(cols[4] || 0)); // Thành tiền
-       sheet.cell("H" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-       sheet.cell("I" + (startRow + i)).value(Number(cols[6] || 0)); // Thành tiền
-       sheet.cell("J" + (startRow + i)).value(Number(cols[7] || 0)); // Thành tiền
-       sheet.cell("K" + (startRow + i)).value(Number(cols[8] || 0)); // Thành tiền
+      sheet.cell("F" + (startRow + i)).value(Number(cols[4] || 0)); // SỐ LƯỢNG
+
+      sheet.cell("G" + (startRow + i)).value(Number(cols[5] || 0)); // ĐƠN VỊ
+
+       sheet.cell("H" + (startRow + i)).value(Number(cols[6] || 0)); // ĐƠN GIÁ
+
+       sheet.cell("I" + (startRow + i)).value(Number(cols[7] || 0)); // Thành tiền
+       sheet.cell("J" + (startRow + i)).value(Number(cols[8] || 0)); // CHIẾT KHẤU
+       sheet.cell("K" + (startRow + i)).value(Number(cols[9] || 0)); // SAU CK
     }
   });
 // Dòng tiếp theo sau sản phẩm
-let totalRow = startRow + rows.length;
-  sheet.cell("B" + totalRow).value("Tổng tiền hàng chưa bao gồm VAT:");
-  sheet.cell("K"+ totalRow).value("" + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
-  sheet.cell("B" + totalRow+1).value("Tiền thuế GTGT :");
-sheet.cell("K" + (totalRow +1)).value(Number(thue || 0));
-  sheet.cell("B" + totalRow+2).value("Tổng thanh toán:");
-sheet.cell("K" + (totalRow +2)).value(Number(tongthanhtoan || 0));
-  sheet.cell("B" + totalRow+3).value("Đã tạm ứng:");
-sheet.cell("K" + (totalRow +3)).value(Number(datamung || 0));
-  sheet.cell("B" + totalRow+4).value("Số tiền thanh toán còn lại:");
-sheet.cell("K" + (totalRow +4)).value(Number(conlai || 0));
+sheet.cell("B" + totalRow).value("Tổng tiền hàng chưa bao gồm VAT:");
+sheet.cell("K" + totalRow).value(Number(thanhtoanchuaVAT || 0).toLocaleString("vi-VN") + " VND");
+
+sheet.cell("B" + (totalRow+1)).value("Tiền thuế GTGT:");
+sheet.cell("K" + (totalRow+1)).value(Number(thue || 0).toLocaleString("vi-VN") + " VND");
+
+sheet.cell("B" + (totalRow+2)).value("Tổng thanh toán:");
+sheet.cell("K" + (totalRow+2)).value(Number(tongthanhtoan || 0).toLocaleString("vi-VN") + " VND");
+
+sheet.cell("B" + (totalRow+3)).value("Đã tạm ứng:");
+sheet.cell("K" + (totalRow+3)).value(Number(datamung || 0).toLocaleString("vi-VN") + " VND");
+
+sheet.cell("B" + (totalRow+4)).value("Số tiền thanh toán còn lại:");
+sheet.cell("K" + (totalRow+4)).value(Number(conlai || 0).toLocaleString("vi-VN") + " VND");
+
   // Xuất file
   workbook.outputAsync().then(function(blob) {
     const url = window.URL.createObjectURL(blob);
