@@ -1,78 +1,74 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/xlsx-populate/browser/xlsx-populate.min.js"></script>
 <script>
-async function exportExcel() {
+async function exportFromTemplate() {
+  // Link file template trên GitHub (RAW link)
+  const url = "https://raw.githubusercontent.com/saleadmin1-alt/bill-template/main/template.xlsx";
+
+  // Load template
+  const response = await fetch(url);
+  const buffer = await response.arrayBuffer();
+
+  // Mở workbook
+  const workbook = await XlsxPopulate.fromDataAsync(buffer);
+  const sheet = workbook.sheet(0);
+
+  // Lấy tham số từ URL
   const params = new URLSearchParams(window.location.search);
 
-  // Lấy params
-  const storeName = params.get("tencuahang") || "Cửa hàng chưa đặt tên";
-  const storeAddress = params.get("diachicuahang") || "";
-  const storePhone = params.get("dienthoaicuahang") || "";
-  const id = params.get("id") || "";
-  const ten = decodeURIComponent(params.get("ten") || "");
-  const diachi = decodeURIComponent(params.get("diachi") || "");
-  const thanhtoan = decodeURIComponent(params.get("thanhtoan") || "0");
-  const bankCode = params.get("bank") || "";
-  const accountNumber = params.get("stk") || "";
-  const accountName = decodeURIComponent(params.get("chutk") || "");
+  const storeName   = params.get("tencuahang") || "";
+  const storeAddr   = params.get("diachicuahang") || "";
+  const storePhone  = params.get("dienthoaicuahang") || "";
+  const orderId     = params.get("id") || "";
+  const customer    = params.get("ten") || "";
+  const custAddr    = params.get("diachi") || "";
+  const totalPay    = params.get("thanhtoan") || "0";
+  const bank        = params.get("bank") || "";
+  const account     = params.get("stk") || "";
+  const accountName = params.get("chutk") || "";
 
-  // Parse sản phẩm
+  // Parse danh sách sản phẩm
   const data = decodeURIComponent(params.get("data") || "");
-  const rows = data.split("_n_"); 
-  let products = [];
-  rows.forEach((r, index) => {
+  const rows = data.split("_n_");
+
+  // ---- Ghi dữ liệu vào template ----
+  sheet.cell("B3").value(storeName);
+  sheet.cell("B4").value(storeAddr);
+  sheet.cell("B5").value(storePhone);
+
+  sheet.cell("B7").value("Mã đơn hàng: " + orderId);
+  sheet.cell("B8").value("Khách hàng: " + customer);
+  sheet.cell("B9").value("Địa chỉ: " + custAddr);
+  sheet.cell("B10").value("Thanh toán: " + Number(totalPay).toLocaleString("vi-VN") + " VND");
+
+  sheet.cell("E6").value("Ngân hàng: " + bank);
+  sheet.cell("E7").value("STK: " + account);
+  sheet.cell("E8").value("Chủ TK: " + accountName);
+
+  // Đổ sản phẩm vào bảng (giả sử bảng bắt đầu từ dòng 12)
+  let startRow = 12;
+  rows.forEach((r, i) => {
     if (r.trim() !== "") {
-      const cols = r.split("|"); 
-      products.push([
-        index+1,
-        cols[0] || "",
-        cols[1] || "",
-        cols[2] || "",
-        cols[3] || "",
-        cols[4] || "",
-        cols[5] || ""
-      ]);
+      const cols = r.split("|");
+      sheet.cell("A" + (startRow + i)).value(i + 1);          // STT
+      sheet.cell("B" + (startRow + i)).value(cols[0] || ""); // SKU
+      sheet.cell("C" + (startRow + i)).value(cols[1] || ""); // Sản phẩm
+      sheet.cell("D" + (startRow + i)).value(cols[2] || ""); // ĐVT
+      sheet.cell("E" + (startRow + i)).value(Number(cols[3] || 0)); // SL
+      sheet.cell("F" + (startRow + i)).value(Number(cols[4] || 0)); // Đơn giá
+      sheet.cell("G" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
     }
   });
 
-  // 🔹 Link tới template.xlsx trên GitHub (thay <username>/<repo>)
-  const url = "https://raw.githubusercontent.com/saleadmin1-alt/bill-template/main/template.xlsx";
-
-  // Đọc template
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  const wb = XLSX.read(arrayBuffer, { type: "array" });
-  const ws = wb.Sheets[wb.SheetNames[0]]; // sheet đầu tiên trong template
-
-  // ---- Gán dữ liệu vào template ----
-  ws["E2"] = { t: "s", v: storeName };
-  ws["E3"] = { t: "s", v: storeAddress };
-  ws["$4"] = { t: "s", v: storePhone };
-
-  ws["C8"] = { t: "s", v: id };
-  ws["C9"] = { t: "s", v: ten };
-  ws["C10"] = { t: "s", v: diachi };
-  ws["E8"] = { t: "s", v: Number(thanhtoan).toLocaleString("vi-VN")+" VND" };
-
-  ws["B10"] = { t: "s", v: bankCode };
-  ws["B11"] = { t: "s", v: accountNumber };
-  ws["B12"] = { t: "s", v: accountName };
-
-  // Ghi sản phẩm bắt đầu từ dòng 15 (tùy template của bạn)
-  let startRow = 15;
-  products.forEach((p, i) => {
-    const row = startRow + i;
-    ws["A"+row] = { t: "n", v: p[0] };
-    ws["B"+row] = { t: "s", v: p[1] };
-    ws["C"+row] = { t: "s", v: p[2] };
-    ws["D"+row] = { t: "s", v: p[3] };
-    ws["E"+row] = { t: "n", v: Number(p[4]) || 0 };
-    ws["F"+row] = { t: "n", v: Number(p[5]) || 0 };
-    ws["G"+row] = { t: "n", v: Number(p[6]) || 0 };
-  });
-
   // Xuất file
-  XLSX.writeFile(wb, "XacNhanDonHang_" + id + ".xlsx");
+  workbook.outputAsync().then(function(blob) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "DonHang_" + orderId + ".xlsx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  });
 }
 </script>
 
-<button class="print-btn" onclick="exportExcel()">📥 Xuất Excel</button>
+<button onclick="exportFromTemplate()">📥 Xuất Excel (giữ format)</button>
