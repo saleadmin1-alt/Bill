@@ -56,10 +56,10 @@ rows.forEach((r, i) => {
      sheet.cell("E" + (startRow + i)).value(Number(cols[1] || 0)); // SỐ LƯỢNG
     sheet.cell("F" + (startRow + i)).value(cols[2] ||""); // ĐƠN VỊ
     sheet.cell("G" + (startRow + i)).value(Number(cols[3] || 0)); // SỐ TẤM
-    sheet.cell("H" + (startRow + i)).value(Number(cols[4] || 0).toLocaleString("vi-VN"))
+    sheet.cell("H" + (startRow + i)).value(Number(cols[4] || 0).toLocaleString("vi-VN"));
      // hiển thị 713.558
-    sheet.cell("I" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-    sheet.cell("K" + (startRow + i)).value(Number(cols[8] || 0)); // SAU CK
+    sheet.cell("I" + (startRow + i)).value(Number(cols[5] || 0).toLocaleString("vi-VN")); // Thành tiền
+    sheet.cell("K" + (startRow + i)).value(Number(cols[8] || 0).toLocaleString("vi-VN")); // SAU CK
  // --- Chiết khấu ---
    // Dữ liệu: _0.0171|200000_
 let ckTyLe = parseFloat(cols[6] || 0);   // 0.0171
