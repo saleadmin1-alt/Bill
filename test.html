@@ -1,260 +1,83 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Xác nhận đơn hàng / Hóa đơn</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h2 { text-align: center; margin-bottom: 5px; }
-    .store-info { text-align: center; margin-bottom: 10px; }
-    .barcode-box { text-align: center; margin: 10px 0; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #333; padding: 6px; text-align: center; }
-    th { background: #eee; }
-    .total-row td { font-weight: bold; }
-    .btn-box { text-align: center; margin: 10px 0; }
-    .btn {
-      display: inline-block;
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+function exportExcel() {
+  const wb = XLSX.utils.book_new();
+  const params = new URLSearchParams(window.location.search);
+
+  // Lấy params
+  const storeName = params.get("tencuahang") || "Cửa hàng chưa đặt tên";
+  const storeAddress = params.get("diachicuahang") || "";
+  const storePhone = params.get("dienthoaicuahang") || "";
+  const id = params.get("id") || "";
+  const ten = decodeURIComponent(params.get("ten") || "");
+  const diachi = decodeURIComponent(params.get("diachi") || "");
+  const thanhtoan = decodeURIComponent(params.get("thanhtoan") || "0");
+  const bankCode = params.get("bank") || "";
+  const accountNumber = params.get("stk") || "";
+  const accountName = decodeURIComponent(params.get("chutk") || "");
+
+  // Parse sản phẩm
+  const data = decodeURIComponent(params.get("data") || "");
+  const rows = data.split("_n_"); 
+  let productRows = [["STT","SKU","SẢN PHẨM","ĐVT","SỐ LƯỢNG","ĐƠN GIÁ","THÀNH TIỀN"]];
+  rows.forEach((r, index) => {
+    if (r.trim() !== "") {
+      const cols = r.split("|"); 
+      productRows.push([
+        index+1,
+        cols[0] || "",
+        cols[1] || "",
+        cols[2] || "",
+        cols[3] || "",
+        cols[4] || "",
+        cols[5] || ""
+      ]);
     }
-    .btn:hover { background: #0056b3; }
-    .qr-box { text-align: center; margin-top: 15px; }
-    .qr-box img { width: 220px; height: 220px; }
-    @media print {
-      .btn-box { display: none; }
-    }
-  </style>
-</head>
-<body>
-  <div class="store-info">
-    <div id="storeName"><b></b></div>
-    <div id="storeAddress"></div>
-    <div id="storePhone"></div>
-  </div>
+  });
 
-  <h2>XÁC NHẬN ĐƠN HÀNG</h2>
+  // Tạo sheet chính
+  const wsData = [
+    ["CÔNG TY TNHH / CỬA HÀNG", storeName],
+    ["Địa chỉ", storeAddress],
+    ["Điện thoại", storePhone],
+    [],
+    ["XÁC NHẬN ĐƠN HÀNG"],
+    ["Mã đơn hàng:", id],
+    ["Khách hàng:", ten],
+    ["Địa chỉ KH:", diachi],
+    ["Số tiền thanh toán:", Number(thanhtoan).toLocaleString("vi-VN")+" VND"],
+    [],
+    ["TÀI KHOẢN THANH TOÁN"],
+    ["Ngân hàng", bankCode],
+    ["Số tài khoản", accountNumber],
+    ["Chủ tài khoản", accountName],
+    [],
+    ["CHI TIẾT SẢN PHẨM:"],
+    ...productRows
+  ];
 
-  <div class="barcode-box">
-    <img id="barcode" alt="Mã vạch đơn hàng">
-  </div>
-  <div class="center">Mã đơn hàng: <span id="invoiceId"></span></div>
-  <div class="center">Ngày tạo đơn: <span id="orderDate"></span></div>
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-  <div class="btn-box">
-    <button class="btn" onclick="window.print()">🖨 In hóa đơn</button>
-    <button class="btn" onclick="exportExcelFull()">📥 Xuất Excel</button>
-  </div>
+  // Merge & định dạng
+  ws['!merges'] = [
+    {s:{r:4,c:0}, e:{r:4,c:6}} // gộp dòng "XÁC NHẬN ĐƠN HÀNG"
+  ];
 
-  <div id="info">
-    <p><b>Khách hàng:</b> <span id="custName"></span></p>
-    <p><b>Địa chỉ:</b> <span id="custAddress"></span></p>
-    <p><b>Số tiền thanh toán:</b> <span id="custPayment"></span> VND</p>
-  </div>
+  // Set width cột
+  ws['!cols'] = [
+    {wch:5},  // STT
+    {wch:15}, // SKU
+    {wch:30}, // Sản phẩm
+    {wch:10}, // ĐVT
+    {wch:12}, // Số lượng
+    {wch:15}, // Đơn giá
+    {wch:18}  // Thành tiền
+  ];
 
-  <table id="billTable">
-    <thead>
-      <tr>
-        <th>STT</th>
-        <th>SKU</th>
-        <th>Sản phẩm</th>
-        <th>Đơn vị</th>
-        <th>Số lượng</th>
-        <th>Đơn giá</th>
-        <th>Thành tiền</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr class="total-row">
-        <td colspan="4">TỔNG CỘNG</td>
-        <td id="tongSlCell">0</td>
-        <td></td>
-        <td id="tongTienCell">0</td>
-      </tr>
-    </tfoot>
-  </table>
+  XLSX.utils.book_append_sheet(wb, ws, "Xác nhận đơn hàng");
 
-  <div id="qrcode" class="qr-box"></div>
+  XLSX.writeFile(wb, "XacNhanDonHang_" + id + ".xlsx");
+}
+</script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-
-    // Lấy thông tin từ URL
-    const storeName = params.get("tencuahang") ? decodeURIComponent(params.get("tencuahang")) : "";
-    const storeAddress = params.get("diachicuahang") ? decodeURIComponent(params.get("diachicuahang")) : "";
-    const storePhone = params.get("dienthoaicuahang") ? decodeURIComponent(params.get("dienthoaicuahang")) : "";
-    const id = params.get("id") ? decodeURIComponent(params.get("id")) : "";
-    const ten = params.get("ten") ? decodeURIComponent(params.get("ten")) : "";
-    const diachi = params.get("diachi") ? decodeURIComponent(params.get("diachi")) : "";
-    const thanhtoan = params.get("thanhtoan") ? decodeURIComponent(params.get("thanhtoan")) : "0";
-    const bankCode = params.get("bank") ? decodeURIComponent(params.get("bank")) : "";
-    const accountNumber = params.get("stk") ? decodeURIComponent(params.get("stk")) : "";
-    const accountName = params.get("chutk") ? decodeURIComponent(params.get("chutk")) : "";
-
-    // Hiển thị thông tin lên trang
-    document.getElementById("storeName").innerText = storeName;
-    document.getElementById("storeAddress").innerText = "Địa chỉ: " + storeAddress;
-    document.getElementById("storePhone").innerText = "SĐT: " + storePhone;
-    document.getElementById("invoiceId").innerText = id;
-    document.getElementById("custName").innerText = ten;
-    document.getElementById("custAddress").innerText = diachi;
-    document.getElementById("custPayment").innerText = Number(thanhtoan).toLocaleString("vi-VN");
-    document.getElementById("orderDate").innerText = new Date().toLocaleDateString("vi-VN");
-
-    // Mã vạch
-    if (id) {
-      document.getElementById("barcode").src =
-        "https://barcode.tec-it.com/barcode.ashx?code=Code128&translate-esc=on&data=" + encodeURIComponent(id);
-    }
-
-    // Tạo bảng sản phẩm
-    const dataStr = params.get("data") ? decodeURIComponent(params.get("data")) : "";
-    const rows = dataStr.split("_n_");
-    const tbody = document.querySelector("#billTable tbody");
-    let tongTien = 0;
-    let tongSL = 0;
-
-    rows.forEach((r, idx) => {
-      if (r.trim()) {
-        const cols = r.split("|");
-        // cols thiết kế: [SKU, Tên sản phẩm, ĐVT, Số lượng, Đơn giá, Thành tiền] — tùy bạn truyền dữ liệu
-        // Theo link của bạn, data = "TS_E57C2940|Bếp điện tử-TS_E57C2940|Cái|1|167|167"
-        const tr = document.createElement("tr");
-
-        const tdStt = document.createElement("td");
-        tdStt.innerText = idx + 1;
-        tr.appendChild(tdStt);
-
-        // SKU
-        const tdSKU = document.createElement("td");
-        tdSKU.innerText = cols[0] || "";
-        tr.appendChild(tdSKU);
-
-        // Tên sản phẩm
-        const tdName = document.createElement("td");
-        tdName.innerText = cols[1] || "";
-        tr.appendChild(tdName);
-
-        // Đơn vị
-        const tdDVT = document.createElement("td");
-        tdDVT.innerText = cols[2] || "";
-        tr.appendChild(tdDVT);
-
-        // Số lượng
-        const qty = parseFloat(cols[3]) || 0;
-        const tdQty = document.createElement("td");
-        tdQty.innerText = qty;
-        tr.appendChild(tdQty);
-        tongSL += qty;
-
-        // Đơn giá
-        const price = parseFloat(cols[4]) || 0;
-        const tdPrice = document.createElement("td");
-        tdPrice.innerText = price.toLocaleString("vi-VN");
-        tr.appendChild(tdPrice);
-
-        // Thành tiền
-        const total = parseFloat(cols[5]) || (qty * price);
-        const tdTotal = document.createElement("td");
-        tdTotal.innerText = total.toLocaleString("vi-VN");
-        tr.appendChild(tdTotal);
-        tongTien += total;
-
-        tbody.appendChild(tr);
-      }
-    });
-
-    document.getElementById("tongSlCell").innerText = tongSL.toLocaleString("vi-VN");
-    document.getElementById("tongTienCell").innerText = tongTien.toLocaleString("vi-VN") + " VND";
-
-    // QR thanh toán (nếu cần)
-    if (thanhtoan !== "0" && bankCode && accountNumber) {
-      const qrUrl = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact.jpg?amount=${thanhtoan}&addInfo=CK%20${encodeURIComponent(ten)}&accountName=${encodeURIComponent(accountName)}`;
-      document.getElementById("qrcode").innerHTML = `
-        <p><b>QR Code Thanh toán</b></p>
-        <img src="${qrUrl}" alt="QR Thanh toán">
-      `;
-    }
-
-    // Hàm xuất Excel đầy đủ
-    function exportExcelFull() {
-      const wb = XLSX.utils.book_new();
-      const ws_data = [];
-
-      // Header công ty
-      ws_data.push([storeName]);
-      ws_data.push(["Địa chỉ: " + storeAddress]);
-      ws_data.push(["SĐT: " + storePhone]);
-      ws_data.push([]);
-      // Dòng tiêu đề đơn hàng
-      ws_data.push(["XÁC NHẬN ĐƠN HÀNG"]);
-      ws_data.push(["Mã đơn hàng:", id]);
-      ws_data.push(["Ngày tạo đơn:", new Date().toLocaleDateString("vi-VN")]);
-      ws_data.push([]);
-      // Thông tin khách hàng
-      ws_data.push(["Khách hàng:", ten]);
-      ws_data.push(["Địa chỉ:", diachi]);
-      ws_data.push(["Số tiền thanh toán:", thanhtoan]);
-      ws_data.push([]);
-      // Tài khoản thanh toán
-      ws_data.push(["Tài khoản thanh toán"]);
-      ws_data.push(["Ngân hàng:", bankCode]);
-      ws_data.push(["Số tài khoản:", accountNumber]);
-      ws_data.push(["Chủ tài khoản:", accountName]);
-      ws_data.push([]);
-      // Chi tiết sản phẩm
-      ws_data.push(["STT","SKU","Sản phẩm","Đơn vị","Số lượng","Đơn giá","Thành tiền"]);
-      // dữ liệu sản phẩm
-      rows.forEach((r, idx) => {
-        if (r.trim()) {
-          const cols = r.split("|");
-          const qty = parseFloat(cols[3]) || 0;
-          const price = parseFloat(cols[4]) || 0;
-          const total = parseFloat(cols[5]) || (qty * price);
-          ws_data.push([
-            idx + 1,
-            cols[0] || "",
-            cols[1] || "",
-            cols[2] || "",
-            qty,
-            price,
-            total
-          ]);
-        }
-      });
-      ws_data.push([]);
-      ws_data.push(["Tổng số lượng:", tongSL]);
-      ws_data.push(["Tổng thành tiền:", tongTien]);
-      ws_data.push([]);
-
-      ws_data.push(["Người lập đơn",'','Người nhận','']);
-      ws_data.push(["(Ký, họ tên)",'','(Ký, họ tên)','']);
-
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      // Optionally: set column widths
-      ws['!cols'] = [
-        {wch:6}, // STT
-        {wch:20}, // SKU
-        {wch:30}, // Sản phẩm
-        {wch:15}, // Đơn vị
-        {wch:12}, // Số lượng
-        {wch:15}, // Đơn giá
-        {wch:15}  // Thành tiền
-      ];
-
-      XLSX.utils.book_append_sheet(wb, ws, "Đơn hàng");
-      XLSX.writeFile(wb, `XacNhanDon_${id || Date.now()}.xlsx`);
-    }
-
-  </script>
-</body>
-</html>
+<button class="print-btn" onclick="exportExcel()">📥 Xuất Excel</button>
