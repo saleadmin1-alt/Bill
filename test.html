@@ -1,180 +1,59 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Hóa đơn bán hàng</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h2 { text-align: center; margin-bottom: 5px; }
-    .store-info { text-align: center; margin-bottom: 10px; }
-    .barcode-box { text-align: center; margin: 10px 0; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #333; padding: 6px; text-align: center; }
-    th { background: #eee; }
-    .total-row td { font-weight: bold; }
-    .btn-box { text-align: center; margin: 10px 0; }
-    .btn {
-      display: inline-block;
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .btn:hover { background: #0056b3; }
-    .qr-box { text-align: center; margin-top: 15px; }
-    .qr-box img { width: 220px; height: 220px; }
-    @media print {
-      .btn-box { display: none; }
-    }
-  </style>
-</head>
-<body>
-  <!-- Thông tin cửa hàng -->
-  <div class="store-info">
-    <div id="storeName"><b>Cửa hàng chưa đặt tên</b></div>
-    <div id="storeAddress">Địa chỉ:</div>
-    <div id="storePhone">SĐT:</div>
-  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+function exportExcelFull() {
+  const wb = XLSX.utils.book_new();
+  const ws_data = [
+    ["CÔNG TY TNHH AURY VIỆT NAM"],
+    ["Head Office: Lầu 9, Tòa nhà Viễn Đông, 14 Phan Tôn, Phường Tân Định, TP Hồ Chí Minh"],
+    ["Showroom: 211 Đỗ Pháp Thuận, Phường Bình Trưng, Thành Phố Thủ Đức"],
+    ["Tax code: 0313074659"],
+    ["Phone: 0985 190 667 | Email: info@auryvietnam.com | Website: auryvietnam.com"],
+    [],
+    ["XÁC NHẬN ĐƠN HÀNG"],
+    ["Mã đơn hàng:", document.getElementById("invoiceId").textContent],
+    ["Ngày tạo đơn:", new Date().toLocaleDateString("vi-VN")],
+    [],
+    ["I. THÔNG TIN MUA HÀNG"],
+    ["Khách hàng:", document.querySelector("#info b") ? document.querySelector("#info").innerText : ""],
+    ["Địa chỉ:", ""],
+    ["Điện thoại:", ""],
+    [],
+    ["II. TÀI KHOẢN THANH TOÁN"],
+    ["Ngân hàng:", "Ngân hàng TMCP Việt Nam Thịnh Vượng"],
+    ["Swift code:", "VPBKVNVX"],
+    ["Số tài khoản:", "114210595"],
+    ["Người thụ hưởng:", "CÔNG TY TNHH AURY VIỆT NAM"],
+    [],
+    ["III. CHI TIẾT SẢN PHẨM"],
+    ["STT","SKU","SẢN PHẨM","SỐ LƯỢNG","ĐƠN VỊ","ĐƠN GIÁ","THÀNH TIỀN","CHIẾT KHẤU","THÀNH TIỀN SAU CK"]
+  ];
 
-  <h2>HÓA ĐƠN BÁN HÀNG</h2>
+  // Lấy dữ liệu sản phẩm từ bảng web
+  const rows = document.querySelectorAll("#billTable tbody tr");
+  rows.forEach(r => {
+    const cols = Array.from(r.querySelectorAll("td")).map(td => td.innerText);
+    // Bổ sung thêm cột chiết khấu & sau chiết khấu (ví dụ: =thành tiền)
+    ws_data.push([...cols, 0, cols[6]]);
+  });
 
-  <div class="barcode-box">
-    <img id="barcode" alt="Mã vạch đơn hàng">
-  </div>
+  ws_data.push([]);
+  ws_data.push(["Tổng tiền hàng (chưa VAT):", document.getElementById("tongTienCell").innerText]);
+  ws_data.push(["Tiền thuế GTGT %:", ""]);
+  ws_data.push(["Tổng thanh toán:", document.getElementById("tongTienCell").innerText]);
+  ws_data.push(["Đã tạm ứng:", ""]);
+  ws_data.push(["Số tiền còn lại:", document.getElementById("tongTienCell").innerText]);
 
-  <div class="center">Mã HĐ: <span id="invoiceId"></span></div>
+  ws_data.push([]);
+  ws_data.push(["Người lập phiếu","Thủ kho","Người nhận hàng"]);
+  ws_data.push(["(Ký, họ tên)","(Ký, họ tên)","(Ký, họ tên)"]);
 
-  <!-- Các nút chức năng -->
-  <div class="btn-box">
-    <button class="btn" onclick="window.print()">🖨 In hóa đơn</button>
-    <button class="btn" onclick="exportExcel()">📥 Xuất Excel</button>
-  </div>
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
-  <!-- Thông tin khách hàng -->
-  <div id="info"></div>
+  // Auto width
+  const colWidths = ws_data[0].map((_, i) => ({wch: 20}));
+  ws['!cols'] = colWidths;
 
-  <!-- Bảng sản phẩm -->
-  <table id="billTable">
-    <thead>
-      <tr>
-        <th>STT</th>
-        <th>Mã hàng</th>
-        <th>Tên hàng</th>
-        <th>ĐVT</th>
-        <th>Số lượng</th>
-        <th>Đơn giá</th>
-        <th>Thành tiền</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr class="total-row">
-        <td colspan="4">TỔNG CỘNG</td>
-        <td id="tongSlCell">0</td>
-        <td></td>
-        <td id="tongTienCell">0</td>
-      </tr>
-    </tfoot>
-  </table>
-
-  <!-- QR thanh toán -->
-  <div id="qrcode" class="qr-box"></div>
-
-  <!-- Thư viện xuất Excel -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-
-    // Thông tin cửa hàng
-    document.getElementById("storeName").textContent = params.get("tencuahang") || "Cửa hàng chưa đặt tên";
-    document.getElementById("storeAddress").textContent = "Địa chỉ: " + (params.get("diachicuahang") || "");
-    document.getElementById("storePhone").textContent = "SĐT: " + (params.get("dienthoaicuahang") || "");
-
-    // Hóa đơn & khách hàng
-    const id = params.get("id") || "";
-    const ten = decodeURIComponent(params.get("ten") || "");
-    const diachi = decodeURIComponent(params.get("diachi") || "");
-    const thanhtoan = decodeURIComponent(params.get("thanhtoan") || "0");
-
-    // VietQR
-    const bankCode = params.get("bank") || "";        
-    const accountNumber = params.get("stk") || "";    
-    const accountName = decodeURIComponent(params.get("chutk") || ""); 
-
-    // Mã vạch
-    if (id) {
-      document.getElementById("barcode").src =
-        "https://barcode.tec-it.com/barcode.ashx?code=Code128&translate-esc=on&data=" + encodeURIComponent(id);
-      document.getElementById("invoiceId").textContent = id;
-    }
-
-    // Thông tin khách hàng
-    document.getElementById("info").innerHTML = `
-      <p><b>Khách hàng:</b> ${ten}</p>
-      <p><b>Địa chỉ:</b> ${diachi}</p>
-      <p><b>Số tiền thanh toán:</b> ${Number(thanhtoan).toLocaleString("vi-VN")} VND</p>
-    `;
-
-    // Sản phẩm
-    const data = decodeURIComponent(params.get("data") || "");
-    const rows = data.split("_n_"); 
-    const tbody = document.querySelector("#billTable tbody");
-    let tongTien = 0;
-    let tongSL = 0;
-
-    rows.forEach((r, index) => {
-      if (r.trim() !== "") {
-        const cols = r.split("|"); 
-        const tr = document.createElement("tr");
-
-        const tdStt = document.createElement("td");
-        tdStt.textContent = index + 1;
-        tr.appendChild(tdStt);
-
-        cols.forEach((c, i) => {
-          const td = document.createElement("td");
-          td.textContent = c;
-
-          if (i === 4) { // số lượng
-            const sl = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
-            tongSL += sl;
-          }
-
-          if (i === 6) { // thành tiền
-            const val = parseFloat(c.replace(/[^0-9.-]/g, "")) || 0;
-            tongTien += val;
-          }
-
-          tr.appendChild(td);
-        });
-
-        tbody.appendChild(tr);
-      }
-    });
-
-    document.getElementById("tongSlCell").textContent = tongSL.toLocaleString("vi-VN");
-    document.getElementById("tongTienCell").textContent = tongTien.toLocaleString("vi-VN") + " VND";
-
-    // QR Code VietQR
-    if (thanhtoan !== "0" && bankCode && accountNumber) {
-      const qrUrl = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact.jpg?amount=${thanhtoan}&addInfo=CK%20${encodeURIComponent(ten)}&accountName=${encodeURIComponent(accountName)}`;
-      document.getElementById("qrcode").innerHTML = `
-        <p><b>QR Code Thanh toán</b></p>
-        <img src="${qrUrl}" alt="QR Thanh toán">
-      `;
-    }
-
-    // Xuất Excel
-    function exportExcel() {
-      const table = document.getElementById("billTable");
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Hóa đơn" });
-      XLSX.writeFile(wb, `HoaDon_${id || Date.now()}.xlsx`);
-    }
-  </script>
-</body>
-</html>
+  XLSX.utils.book_append_sheet(wb, ws, "Xác nhận ĐH");
+  XLSX.writeFile(wb, `XacNhanDonHang_${Date.now()}.xlsx`);
+}
+</script>
