@@ -13,8 +13,8 @@ async function exportFromTemplate() {
   const ws = wb.Sheets[wb.SheetNames[0]];
 
   // ---- Gán dữ liệu động vào template ----
-  ws["B7"] = { t: "s", v: "Khách hàng: Nguyễn Văn A" };
-  ws["B8"] = { t: "s", v: "Địa chỉ: 123 Quận 3 HCM" };
+  ws["C8"] = { t: "s", v: "Khách hàng: Nguyễn Văn A" };
+  ws["C9"] = { t: "s", v: "Địa chỉ: 123 Quận 3 HCM" };
   ws["E12"] = { t: "n", v: 3 };        // Số lượng
   ws["F12"] = { t: "n", v: 150000 };   // Đơn giá
   ws["G12"] = { t: "n", v: 450000 };   // Thành tiền
