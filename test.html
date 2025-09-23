@@ -31,13 +31,20 @@ async function exportFromTemplate() {
   const rows = data.split("_n_");
 
   // ---- Ghi dữ liệu vào template ----
-  sheet.cell("B3").value(storeName);
-  sheet.cell("B4").value(storeAddr);
-  sheet.cell("B5").value(storePhone);
+  
 
-  sheet.cell("B7").value("Mã đơn hàng: " + orderId);
-  sheet.cell("B8").value("Khách hàng: " + customer);
-  sheet.cell("B9").value("Địa chỉ: " + custAddr);
+  sheet.cell("F6").value("Mã đơn hàng: " + orderId);
+  sheet.cell("F7").value("Mã đơn hàng: " + orderId);
+
+
+
+  
+  sheet.cell("C9").value("Khách hàng: " + customer);
+  sheet.cell("C10").value("Địa chỉ: " + custAddr);
+  sheet.cell("C11").value(storeName);
+  sheet.cell("c12").value(storeAddr);
+  sheet.cell("c13").value(storePhone);
+  
   sheet.cell("B10").value("Thanh toán: " + Number(totalPay).toLocaleString("vi-VN") + " VND");
 
   sheet.cell("E6").value("Ngân hàng: " + bank);
