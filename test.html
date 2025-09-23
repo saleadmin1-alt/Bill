@@ -53,26 +53,26 @@ async function exportFromTemplate() {
       sheet.cell("B" + (startRow + i)).value(cols[0] || ""); // SKU
      
       sheet.cell("E" + (startRow + i)).value(Number(cols[1] || 0)); // SL
-      sheet.cell("F" + (startRow + i)).value(Number(cols[2] || 0)); // Đơn giá
-      sheet.cell("G" + (startRow + i)).value(Number(cols[3] || 0)); // Thành tiền
-       sheet.cell("H" + (startRow + i)).value(Number(cols[4] || 0)); // Thành tiền
-       sheet.cell("I" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-       sheet.cell("J" + (startRow + i)).value(Number(cols[6] || 0)); // Thành tiền
-       sheet.cell("K" + (startRow + i)).value(Number(cols[7] || 0)); // Thành tiền
+      sheet.cell("F" + (startRow + i)).value(Number(cols[4] || 0)); // Đơn giá
+      sheet.cell("G" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
+       sheet.cell("H" + (startRow + i)).value(Number(cols[6] || 0)); // Thành tiền
+       sheet.cell("I" + (startRow + i)).value(Number(cols[7] || 0)); // Thành tiền
+       sheet.cell("J" + (startRow + i)).value(Number(cols[8] || 0)); // Thành tiền
+       sheet.cell("K" + (startRow + i)).value(Number(cols[9] || 0)); // Thành tiền
     }
   });
 // Dòng tiếp theo sau sản phẩm
 let totalRow = startRow + rows.length + 2;
   sheet.cell("A" + totalRow+1).value("Tổng tiền hàng chưa bao gồm VAT:");
-  sheet.cell("E"+ totalRow+1).value("" + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
+  sheet.cell("K"+ totalRow+1).value("" + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
   sheet.cell("A" + totalRow+2).value("Tiền thuế GTGT :");
-sheet.cell("E" + (totalRow + 2)).value(Number(thue || 0));
+sheet.cell("K" + (totalRow + 2)).value(Number(thue || 0));
   sheet.cell("A" + totalRow+3).value("Tổng thanh toán:");
-sheet.cell("E" + (totalRow + 3)).value(Number(tongthanhtoan || 0));
+sheet.cell("K" + (totalRow + 3)).value(Number(tongthanhtoan || 0));
   sheet.cell("A" + totalRow+4).value("Đã tạm ứng:");
-sheet.cell("E" + (totalRow +4)).value(Number(datamung || 0));
+sheet.cell("K" + (totalRow +4)).value(Number(datamung || 0));
   sheet.cell("A" + totalRow+5).value("Số tiền thanh toán còn lại:");
-sheet.cell("E" + (totalRow + 5)).value(Number(conlai || 0));
+sheet.cell("K" + (totalRow + 5)).value(Number(conlai || 0));
   // Xuất file
   workbook.outputAsync().then(function(blob) {
     const url = window.URL.createObjectURL(blob);
