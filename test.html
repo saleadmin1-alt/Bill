@@ -12,9 +12,10 @@
     th, td { border: 1px solid #333; padding: 6px; text-align: center; }
     th { background: #eee; }
     .total-row td { font-weight: bold; }
-    .print-btn {
-      display: block;
-      margin: 10px auto;
+    .btn-box { text-align: center; margin: 10px 0; }
+    .btn {
+      display: inline-block;
+      margin: 5px;
       padding: 10px 20px;
       font-size: 16px;
       background: #007bff;
@@ -23,11 +24,11 @@
       border-radius: 8px;
       cursor: pointer;
     }
-    .print-btn:hover { background: #0056b3; }
+    .btn:hover { background: #0056b3; }
     .qr-box { text-align: center; margin-top: 15px; }
     .qr-box img { width: 220px; height: 220px; }
     @media print {
-      .print-btn { display: none; }
+      .btn-box { display: none; }
     }
   </style>
 </head>
@@ -47,7 +48,11 @@
 
   <div class="center">Mã HĐ: <span id="invoiceId"></span></div>
 
-  <button class="print-btn" onclick="window.print()">🖨 In hóa đơn</button>
+  <!-- Các nút chức năng -->
+  <div class="btn-box">
+    <button class="btn" onclick="window.print()">🖨 In hóa đơn</button>
+    <button class="btn" onclick="exportExcel()">📥 Xuất Excel</button>
+  </div>
 
   <!-- Thông tin khách hàng -->
   <div id="info"></div>
@@ -78,6 +83,9 @@
 
   <!-- QR thanh toán -->
   <div id="qrcode" class="qr-box"></div>
+
+  <!-- Thư viện xuất Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -159,6 +167,13 @@
         <p><b>QR Code Thanh toán</b></p>
         <img src="${qrUrl}" alt="QR Thanh toán">
       `;
+    }
+
+    // Xuất Excel
+    function exportExcel() {
+      const table = document.getElementById("billTable");
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Hóa đơn" });
+      XLSX.writeFile(wb, `HoaDon_${id || Date.now()}.xlsx`);
     }
   </script>
 </body>
