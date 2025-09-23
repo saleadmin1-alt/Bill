@@ -60,20 +60,16 @@ rows.forEach((r, i) => {
     sheet.cell("I" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
     sheet.cell("K" + (startRow + i)).value(Number(cols[8] || 0)); // SAU CK
  // --- Chiết khấu ---
-    let chietKhauTyLe = parseFloat(cols[6] || 0); // ví dụ: 0.0171
-    let chietKhauTien = parseFloat(cols[7] || 0); // ví dụ: 200000
+   // Dữ liệu: _0.0171|200000_
+let ckTyLe = parseFloat(cols[6] || 0);   // 0.0171
+let ckTien = parseFloat(cols[7] || 0);   // 200000
 
-    // Hiện tỷ lệ chiết khấu dạng 1,71%
-    sheet.cell("H" + (startRow + i)).value((chietKhauTyLe * 100).toFixed(2) + "%");
+// Gom chung 1 ô: "1,71% | 200.000"
+sheet.cell("J" + (startRow + i)).value(
+  (ckTyLe * 100).toFixed(2).replace(".", ",") + "% | " + ckTien.toLocaleString("vi-VN")
+);
 
-    // Hiện tiền chiết khấu dạng 200.000
-    sheet.cell("I" + (startRow + i)).value(
-      chietKhauTien.toLocaleString("vi-VN")
-    );
-
-    // Sau chiết khấu (Thành tiền - CK)
-    let thanhTienSauCK = Number(cols[5] || 0) - chietKhauTien;
-    sheet.cell("J" + (startRow + i)).value(thanhTienSauCK.toLocaleString("vi-VN"));
+   
   }
 });
 
