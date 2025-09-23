@@ -43,7 +43,6 @@ async function exportFromTemplate() {
    sheet.cell("C14").value(""+ sodienthoai);
   sheet.cell("C15").value("" + email);
 
-  sheet.cell("E20").value("" + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
 
   // Đổ sản phẩm vào bảng (giả sử bảng bắt đầu từ dòng 18)
   let startRow = 18;
@@ -57,29 +56,20 @@ async function exportFromTemplate() {
       sheet.cell("E" + (startRow + i)).value(Number(cols[3] || 0)); // SL
       sheet.cell("F" + (startRow + i)).value(Number(cols[4] || 0)); // Đơn giá
       sheet.cell("G" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-       sheet.cell("H" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-       sheet.cell("I" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-       sheet.cell("J" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-       sheet.cell("K" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
+       sheet.cell("H" + (startRow + i)).value(Number(cols[6] || 0)); // Thành tiền
+       sheet.cell("I" + (startRow + i)).value(Number(cols[7] || 0)); // Thành tiền
+       sheet.cell("J" + (startRow + i)).value(Number(cols[8] || 0)); // Thành tiền
+       sheet.cell("K" + (startRow + i)).value(Number(cols[9] || 0)); // Thành tiền
     }
   });
 // Dòng tiếp theo sau sản phẩm
 let totalRow = startRow + rows.length + 2;
-
-sheet.cell("F" + totalRow).value("Tổng cộng (chưa VAT):");
-sheet.cell("G" + totalRow).value(Number(thanhtoanchuaVAT || 0));
-
-sheet.cell("F" + (totalRow + 1)).value("Thuế:");
-sheet.cell("G" + (totalRow + 1)).value(Number(thue || 0));
-
-sheet.cell("F" + (totalRow + 2)).value("Tổng thanh toán:");
-sheet.cell("G" + (totalRow + 2)).value(Number(tongthanhtoan || 0));
-
-sheet.cell("F" + (totalRow + 3)).value("Đặt trước:");
-sheet.cell("G" + (totalRow + 3)).value(Number(datamung || 0));
-
-sheet.cell("F" + (totalRow + 4)).value("Còn lại:");
-sheet.cell("G" + (totalRow + 4)).value(Number(conlai || 0));
+  sheet.cell("E"+ totalRow+1).value("" + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
+sheet.cell("E" + totalRow+2).value(Number(thanhtoanchuaVAT || 0));
+sheet.cell("E" + (totalRow + 3)).value(Number(thue || 0));
+sheet.cell("E" + (totalRow + 4)).value(Number(tongthanhtoan || 0));
+sheet.cell("E" + (totalRow + 5)).value(Number(datamung || 0));
+sheet.cell("E" + (totalRow + 6)).value(Number(conlai || 0));
   // Xuất file
   workbook.outputAsync().then(function(blob) {
     const url = window.URL.createObjectURL(blob);
