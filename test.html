@@ -54,10 +54,10 @@ rows.forEach((r, i) => {
     sheet.cell("B" + (startRow + i)).value(cols[0] || ""); // SẢN PHẨM
      sheet.cell("E" + (startRow + i)).value(Number(cols[1] || 0)); // SỐ LƯỢNG
     sheet.cell("F" + (startRow + i)).value(Number(cols[2] || 0)); // SỐ LƯỢNG
-    sheet.cell("G" + (startRow + i)).value(Number(cols[3] || 0)); // ĐƠN VỊ
+    sheet.cell("G" + (startRow + i)).value(cols[3] || ""); // ĐƠN VỊ
     sheet.cell("H" + (startRow + i)).value(Number(cols[4] || 0)); // ĐƠN GIÁ
     sheet.cell("I" + (startRow + i)).value(Number(cols[5] || 0)); // Thành tiền
-    sheet.cell("J" + (startRow + i)).value(Number(cols[6] || 0)); // CHIẾT KHẤU
+    sheet.cell("J" + (startRow + i)).value(cols[6] || ""); // CHIẾT KHẤU
     sheet.cell("K" + (startRow + i)).value(Number(cols[7] || 0)); // SAU CK
   }
 });
