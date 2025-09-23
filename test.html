@@ -1,9 +1,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 async function exportFromTemplate() {
-  // Link file template trên GitHub
-  const url = "https://github.com/saleadmin1-alt/bill-template/raw/refs/heads/main/template.xlsx";
-  
+  // Link RAW đúng của GitHub
+  const url = "https://raw.githubusercontent.com/saleadmin1-alt/bill-template/main/template.xlsx";
 
   // Tải template về
   const response = await fetch(url);
