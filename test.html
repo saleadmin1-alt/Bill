@@ -45,14 +45,10 @@ async function exportFromTemplate() {
   sheet.cell("C12").value(storeAddr);
   sheet.cell("C13").value(storePhone);
   
-  sheet.cell("B10").value("Thanh toán: " + Number(totalPay).toLocaleString("vi-VN") + " VND");
-
-  sheet.cell("E6").value("Ngân hàng: " + bank);
-  sheet.cell("E7").value("STK: " + account);
-  sheet.cell("E8").value("Chủ TK: " + accountName);
+  sheet.cell("E20").value("Thanh toán: " + Number(totalPay).toLocaleString("vi-VN") + " VND");
 
   // Đổ sản phẩm vào bảng (giả sử bảng bắt đầu từ dòng 12)
-  let startRow = 12;
+  let startRow = 18;
   rows.forEach((r, i) => {
     if (r.trim() !== "") {
       const cols = r.split("|");
