@@ -35,13 +35,15 @@ async function exportFromTemplate() {
   sheet.cell("F6").value(madonhang);
   sheet.cell("F7").value(ngaytaodon);
 
-  sheet.cell("C9").value("Khách hàng: " + tencongty);
-  sheet.cell("C10").value("Địa chỉ: " + diachicuahang);
-  sheet.cell("C11").value("MST: " + masothue);
-  sheet.cell("C12").value("Liên hệ: " + nguoilienhe + " - " + sodienthoai);
-  sheet.cell("C13").value("Email: " + email);
+  sheet.cell("C9").value("" + tencongty);
+   sheet.cell("C10").value("" + masothue);
+  sheet.cell("C11").value("" + diachicuahang);
+ sheet.cell("C12").value("" + nguoilienhe);
+   sheet.cell("C13").value("" + diachigiaohang);
+   sheet.cell("C14").value(""+ sodienthoai);
+  sheet.cell("C15").value("" + email);
 
-  sheet.cell("E20").value("Thanh toán: " + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
+  sheet.cell("E20").value("" + Number(tongthanhtoan).toLocaleString("vi-VN") + " VND");
 
   // Đổ sản phẩm vào bảng (giả sử bảng bắt đầu từ dòng 18)
   let startRow = 18;
