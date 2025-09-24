@@ -22,23 +22,31 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       font-size: 0.75rem; /* text-xs */
     }
+
+    /* ===== Bảng sản phẩm ===== */
     table {
       border-collapse: collapse;
       width: 100%;
       margin-top: 1rem;
+      table-layout: fixed; /* giữ cột cố định */
     }
     th, td {
       border: 1px solid #e5e7eb;
       padding: 0.5rem;
-      text-align: left;
+      font-size: 0.75rem;
+      white-space: nowrap; /* không xuống dòng */
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     th {
       background-color: #f9fafb;
       font-weight: 600;
+      text-align: center;
     }
-    .font-semibold-custom {
-      font-weight: 600;
-    }
+    td.text-center { text-align: center; }
+    td.text-right { text-align: right; }
+
+    .font-semibold-custom { font-weight: 600; }
     h1 { font-size: 1rem; }
     h2 { font-size: 1.25rem; }
     h3 { font-size: 1rem; }
@@ -49,11 +57,8 @@
       .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
       body { background-color: #fff; margin: 0; padding: 0; }
       @page { size: A4; margin: 1cm; }
-      .table-header-center th { white-space: nowrap; }
-      .breakable-header { white-space: normal; }
+      th, td { font-size: 10px; }
     }
-
-    .table-header-center th { text-align: center; }
   </style>
 </head>
 <body>
@@ -109,17 +114,17 @@
   <!-- Bảng sản phẩm -->
   <div class="my-4">
     <h3 class="text-lg font-bold text-gray-800 mb-2">CHI TIẾT SẢN PHẨM</h3>
-    <table class="w-full text-xs">
+    <table>
       <thead>
-        <tr class="table-header-center">
+        <tr>
           <th>Tên sản phẩm</th>
-          <th class="text-right">Số lượng</th>
+          <th>Số lượng</th>
           <th>Đơn vị</th>
-          <th class="text-right">Số tấm</th>
-          <th class="text-right">Đơn giá</th>
-          <th class="text-right">Thành tiền</th>
-          <th class="text-right">Tiền chiết khấu</th>
-          <th class="text-right breakable-header">Thành tiền<br>(Sau chiết khấu)</th>
+          <th>Số tấm</th>
+          <th>Đơn giá</th>
+          <th>Thành tiền</th>
+          <th>Tiền chiết khấu</th>
+          <th>Thành tiền (Sau CK)</th>
         </tr>
       </thead>
       <tbody id="product-rows"></tbody>
@@ -218,9 +223,9 @@ products.forEach(p => {
   tbody += `
     <tr>
       <td>${p[0]}</td>
-      <td class="text-right">${formatCurrency(p[1])}</td>
-      <td>${p[2]}</td>
-      <td class="text-right">${formatCurrency(p[3])}</td>
+      <td class="text-center">${formatCurrency(p[1])}</td>
+      <td class="text-center">${p[2]}</td>
+      <td class="text-center">${formatCurrency(p[3])}</td>
       <td class="text-right">${formatCurrency(p[4])}</td>
       <td class="text-right">${formatCurrency(p[5])}</td>
       <td class="text-right">${getDiscountDisplay(p[6], p[7], p[5])}</td>
