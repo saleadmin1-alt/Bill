@@ -176,7 +176,7 @@ document.getElementById("bank-info").innerHTML = `
   <div class="font-semibold-custom">Tên ngân hàng:</div><div>${params.get("tennganhang")||""}</div>
   <div class="font-semibold-custom">Swift code:</div><div>${params.get("swiftcode")||""}</div>
   <div class="font-semibold-custom">Số tài khoản:</div><div>${account}</div>
-  <div class="font-semibold-custom">Người thụ hưởng:</div><div>${decodeURIComponent(accountName)}</div>
+  <div class="font-semibold-custom">Người thụ hưởng:</div><div>${params.get("tennguoithuhuong")||""}</div>
 `;
 
 // Product details
