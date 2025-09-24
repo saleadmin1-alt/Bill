@@ -197,7 +197,7 @@ products.forEach(p => {
       <td class="text-center">${formatCurrency(p[3])}</td>
       <td class="text-right">${formatCurrency(p[4])}</td>
       <td class="text-right">${formatCurrency(p[5])}</td>
-      <td >${getDiscountDisplay(p[6], p[7], p[5])}</td>
+     <td class="text-right">${getDiscountDisplay(p[6], p[7], p[5])}</td>
       <td class="text-right">${formatCurrency(p[8] || (p[5]-p[7]))}</td>
     </tr>
   `;
