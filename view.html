@@ -20,28 +20,13 @@
       padding: 1.5rem;
       border-radius: 0.5rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      font-size: 0.75rem; /* text-xs */
+      font-size: 0.75rem;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #e5e7eb;
-      padding: 0.5rem;
-      text-align: left;
-    }
-    th {
-      background-color: #f9fafb;
-      font-weight: 600;
-    }
-    .font-semibold-custom {
-      font-weight: 600;
-    }
-    h1 { font-size: 1rem; }
-    h2 { font-size: 1.25rem; }
-    h3 { font-size: 1rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #e5e7eb; padding: 0.5rem; text-align: left; }
+    th { background-color: #f9fafb; font-weight: 600; }
+    .font-semibold-custom { font-weight: 600; }
+    h1 { font-size: 1rem; } h2 { font-size: 1.25rem; } h3 { font-size: 1rem; }
     p, span, div { font-size: 0.75rem; }
 
     @media print {
@@ -52,26 +37,23 @@
       .table-header-center th { white-space: nowrap; }
       .breakable-header { white-space: normal; }
     }
-
     .table-header-center th { text-align: center; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Nút hành động -->
-  <div class="flex justify-end mb-4 print-button">
-    <button onclick="window.print()" 
-      class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out mr-2">
-      📄 Xuất PDF
+  <!-- Nút in và xuất excel -->
+  <div class="flex justify-end mb-4 print-button space-x-2">
+    <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out">
+      🖨️ Xuất PDF
     </button>
-    <button onclick="exportFromTemplate()" 
-      class="px-4 py-2 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out">
+    <button onclick="exportFromTemplate()" class="px-4 py-2 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out">
       📥 Xuất Excel
     </button>
   </div>
 
-  <!-- Header công ty -->
+  <!-- ========= THÔNG TIN ĐƠN HÀNG ========= -->
   <div class="flex items-start justify-between mb-6">
     <div class="flex-shrink-0 flex items-center h-24">
       <img src="https://drive.google.com/thumbnail?id=1Q4yU0Vg7qiQmwICodsBJ4KzTxva_IeWN&sz=w400" alt="Company Logo" class="rounded-lg h-full object-contain">
@@ -85,13 +67,12 @@
     </div>
   </div>
 
-  <!-- Tiêu đề đơn hàng -->
   <div class="text-center my-6">
     <h2 class="text-2xl font-bold text-gray-900 uppercase">XÁC NHẬN ĐƠN HÀNG</h2>
     <p id="order-info" class="text-sm text-gray-500 mt-1"></p>
   </div>
 
-  <!-- Thông tin khách + ngân hàng -->
+  <!-- KHÁCH HÀNG + NGÂN HÀNG -->
   <div class="grid grid-cols-2 gap-4 my-4 text-sm">
     <div class="p-3 border rounded-md border-gray-200 text-gray-700">
       <h3 class="text-lg font-bold text-gray-800 mb-2">THÔNG TIN MUA HÀNG</h3>
@@ -106,50 +87,40 @@
     </div>
   </div>
 
-  <!-- Bảng sản phẩm -->
+  <!-- BẢNG SẢN PHẨM -->
   <div class="my-4">
     <h3 class="text-lg font-bold text-gray-800 mb-2">CHI TIẾT SẢN PHẨM</h3>
     <table class="w-full text-xs">
       <thead>
         <tr class="table-header-center">
           <th>Tên sản phẩm</th>
-          <th class="text-center">Số lượng</th>
+          <th class="text-right">Số lượng</th>
           <th>Đơn vị</th>
-          <th class="text-center">Số tấm</th>
+          <th class="text-right">Số tấm</th>
           <th class="text-right">Đơn giá</th>
           <th class="text-right">Thành tiền</th>
-          <th class="text-right">Tiền chiết khấu</th>
-          <th class="text-right breakable-header">Thành tiền<br>(Sau chiết khấu)</th>
+          <th class="text-right">Chiết khấu</th>
+          <th class="text-right breakable-header">Thành tiền<br>sau CK</th>
         </tr>
       </thead>
       <tbody id="product-rows"></tbody>
     </table>
   </div>
 
-  <!-- Tổng cộng -->
+  <!-- TỔNG TIỀN -->
   <div class="mt-6 text-sm">
     <div id="totals" class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 justify-end"></div>
   </div>
 
-  <!-- Chữ ký -->
+  <!-- CHỮ KÝ -->
   <div class="flex justify-between mt-10 text-center text-sm">
-    <div class="w-1/3">
-      <p class="font-bold">Người lập phiếu</p>
-      <p class="italic text-gray-500 mt-1">(Ký, họ tên)</p>
-    </div>
-    <div class="w-1/3">
-      <p class="font-bold">Thủ kho</p>
-      <p class="italic text-gray-500 mt-1">(Ký, họ tên)</p>
-    </div>
-    <div class="w-1/3">
-      <p class="font-bold">Người nhận hàng</p>
-      <p class="italic text-gray-500 mt-1">(Ký, họ tên)</p>
-    </div>
+    <div class="w-1/3"><p class="font-bold">Người lập phiếu</p><p class="italic text-gray-500 mt-1">(Ký, họ tên)</p></div>
+    <div class="w-1/3"><p class="font-bold">Thủ kho</p><p class="italic text-gray-500 mt-1">(Ký, họ tên)</p></div>
+    <div class="w-1/3"><p class="font-bold">Người nhận hàng</p><p class="italic text-gray-500 mt-1">(Ký, họ tên)</p></div>
   </div>
 </div>
 
 <script>
-/* ====== Hàm format ====== */
 function formatCurrency(number, decimalPlaces = 0) {
   const n = parseFloat(number) || 0;
   return new Intl.NumberFormat('vi-VN', {
@@ -173,7 +144,7 @@ function getDiscountDisplay(rate, amount, total) {
   return displayRate + " | " + formatCurrency(amount);
 }
 
-/* ====== Parse URL ====== */
+// Parse URL
 const params = new URLSearchParams(window.location.search);
 
 // Order info
@@ -192,7 +163,7 @@ document.getElementById("customer-info").innerHTML = `
   <div class="font-semibold-custom">Email:</div><div>${params.get("email")||""}</div>
 `;
 
-// Bank info + QR
+// Bank info
 const bankCode = params.get("bankcode") || "VCB";
 const account = params.get("sotaikhoan") || "000000000";
 const accountName = encodeURIComponent(params.get("tennguoithuhuong") || "AURY VIETNAM");
@@ -211,7 +182,6 @@ document.getElementById("bank-info").innerHTML = `
 // Product details
 const data = params.get("data") || "";
 const products = data.split("_n_").map(row => row.split("_"));
-
 let tbody = "";
 products.forEach(p => {
   if (p.length < 8) return;
@@ -244,7 +214,7 @@ document.getElementById("totals").innerHTML = `
   <div class="text-red-500 font-bold text-right">${formatCurrency(params.get("conlai"))} VNĐ</div>
 `;
 
-/* ====== Xuất Excel theo template ====== */
+// Xuất Excel từ template
 async function exportFromTemplate() {
   const url = "https://raw.githubusercontent.com/saleadmin1-alt/bill-template/main/template.xlsx";
   const response = await fetch(url);
@@ -252,7 +222,7 @@ async function exportFromTemplate() {
   const workbook = await XlsxPopulate.fromDataAsync(buffer);
   const sheet = workbook.sheet(0);
 
-  // Ghi dữ liệu
+  // Ghi dữ liệu vào Excel (giống code trước của bạn)...
   sheet.cell("F6").value(params.get("madonhang"));
   sheet.cell("F7").value(params.get("ngaytaodon"));
   sheet.cell("C9").value(params.get("tencongty"));
@@ -263,38 +233,41 @@ async function exportFromTemplate() {
   sheet.cell("C14").value(params.get("sodienthoai"));
   sheet.cell("C15").value(params.get("email"));
 
-  // Đổ sản phẩm (dòng bắt đầu 18)
   let startRow = 18;
-  products.forEach((p, i) => {
+  products.forEach((p,i) => {
     if (p.length < 8) return;
-    sheet.cell("A" + (startRow + i)).value(i + 1);
-    sheet.cell("B" + (startRow + i)).value(p[0] || "");
-    sheet.cell("E" + (startRow + i)).value(Number(p[1] || 0));
-    sheet.cell("F" + (startRow + i)).value(p[2] || "");
-    sheet.cell("G" + (startRow + i)).value(Number(p[3] || 0));
-    sheet.cell("H" + (startRow + i)).value(Number(p[4] || 0).toLocaleString("vi-VN"));
-    sheet.cell("I" + (startRow + i)).value(Number(p[5] || 0).toLocaleString("vi-VN"));
-
+    sheet.cell("A" + (startRow+i)).value(i+1);
+    sheet.cell("B" + (startRow+i)).value(p[0] || "");
+    sheet.cell("E" + (startRow+i)).value(Number(p[1] || 0));
+    sheet.cell("F" + (startRow+i)).value(p[2] || "");
+    sheet.cell("G" + (startRow+i)).value(Number(p[3] || 0));
+    sheet.cell("H" + (startRow+i)).value(Number(p[4] || 0).toLocaleString("vi-VN"));
+    sheet.cell("I" + (startRow+i)).value(Number(p[5] || 0).toLocaleString("vi-VN"));
+    sheet.cell("K" + (startRow+i)).value(Number(p[8] || 0).toLocaleString("vi-VN"));
     let ckTyLe = parseFloat(p[6] || 0);
     let ckTien = parseFloat(p[7] || 0);
-    sheet.cell("J" + (startRow + i)).value(
+    sheet.cell("J" + (startRow+i)).value(
       (ckTyLe * 100).toFixed(2).replace(".", ",") + "% | " + ckTien.toLocaleString("vi-VN")
     );
-    sheet.cell("K" + (startRow + i)).value(Number(p[8] || 0).toLocaleString("vi-VN"));
   });
-   sheet.cell("C" + (totalRow+9)).value("Người lập phiếu");
-   sheet.cell("C" + (totalRow+10)).value("(Ký, họ tên)");
-   sheet.cell("G" + (totalRow+9)).value("Thủ kho");
-   sheet.cell("G" + (totalRow+10)).value("(Ký, họ tên)");
-  sheet.cell("J" + (totalRow+9)).value("Người nhận hàng");
-   sheet.cell("J" + (totalRow+10)).value("(Ký, họ tên)");
 
-  // Xuất file
-  workbook.outputAsync().then(function(blob) {
+  let totalRow = startRow + products.length;
+  sheet.cell("B" + totalRow).value("Tổng tiền hàng chưa bao gồm VAT:");
+  sheet.cell("K" + totalRow).value(Number(params.get("thanhtoanchuaVAT") || 0).toLocaleString("vi-VN")+" VND");
+  sheet.cell("B" + (totalRow+1)).value("Tiền thuế GTGT:");
+  sheet.cell("K" + (totalRow+1)).value(Number(params.get("thue") || 0).toLocaleString("vi-VN")+" VND");
+  sheet.cell("B" + (totalRow+2)).value("Tổng thanh toán:");
+  sheet.cell("K" + (totalRow+2)).value(Number(params.get("tongthanhtoan") || 0).toLocaleString("vi-VN")+" VND");
+  sheet.cell("B" + (totalRow+3)).value("Đã tạm ứng:");
+  sheet.cell("K" + (totalRow+3)).value(Number(params.get("datamung") || 0).toLocaleString("vi-VN")+" VND");
+  sheet.cell("B" + (totalRow+4)).value("Số tiền thanh toán còn lại:");
+  sheet.cell("K" + (totalRow+4)).value(Number(params.get("conlai") || 0).toLocaleString("vi-VN")+" VND");
+
+  workbook.outputAsync().then(blob => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "DonHang_" + params.get("madonhang") + ".xlsx";
+    a.download = "DonHang_" + (params.get("madonhang")||"") + ".xlsx";
     a.click();
     window.URL.revokeObjectURL(url);
   });
