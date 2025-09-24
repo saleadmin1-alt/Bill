@@ -215,11 +215,11 @@ document.getElementById("product-rows").innerHTML = tbody;
 // Totals
 document.getElementById("totals").innerHTML = `
   <div class="font-semibold text-gray-700">Tổng tiền hàng chưa bao gồm VAT:</div>
-  <div class="text-gray-900 font-bold text-right">${formatCurrency(params.get("thanhtoanchuaVAT"))} VNĐ</div>
+  <div class="text-gray-900  text-right">${formatCurrency(params.get("thanhtoanchuaVAT"))} VNĐ</div>
  <div class="font-semibold text-gray-700">Tiền thuế GTGT (<span>${params.get("VAT")}</span>):</div>
-  <div class="text-gray-900 font-bold text-right">${formatCurrency(params.get("thue"))} VNĐ</div>
+  <div class="text-gray-900  text-right">${formatCurrency(params.get("thue"))} VNĐ</div>
   <div class="font-semibold text-gray-700">Tổng thanh toán:</div>
-  <div class="text-indigo-600 font-bold text-right">${formatCurrency(params.get("tongthanhtoan"))} VNĐ</div>
+  <div class="text-indigo-600  text-right">${formatCurrency(params.get("tongthanhtoan"))} VNĐ</div>
   <div class="font-semibold text-gray-700">Đã tạm ứng:</div>
   <div class="text-gray-900 font-bold text-right">${formatCurrency(params.get("datamung"))} VNĐ</div>
   <div class="font-semibold text-gray-700">Số tiền thanh toán còn lại:</div>
