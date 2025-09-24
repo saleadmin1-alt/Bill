@@ -233,10 +233,15 @@ async function exportFromTemplate() {
   const buffer = await response.arrayBuffer();
   const workbook = await XlsxPopulate.fromDataAsync(buffer);
   const sheet = workbook.sheet(0);
-
+const madonhang   = params.get("madonhang") || "";
+  const ngaytaodon  = params.get("ngaytaodon") || "";
+  
   // Ghi dữ liệu vào Excel (giống code trước của bạn)...
-  sheet.cell("F6").value("Mã đơn hàng:"+madonhang);
-  sheet.cell("F7").value(params.get("ngaytaodon"));
+  
+  sheet.cell("A6").value("Mã đơn hàng:"+madonhang)
+      .style("horizontalAlignment", "center");
+  sheet.cell("A7").value("Ngày tạo đơn: "+ngaytaodon)
+      .style("horizontalAlignment", "center");
   sheet.cell("C9").value(params.get("tencongty"));
   sheet.cell("C10").value(params.get("masothue"));
   sheet.cell("C11").value(params.get("diachicuahang"));
