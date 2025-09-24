@@ -125,12 +125,19 @@
 </div>
 
 <script>
-function formatCurrency(number, decimalPlaces = 2) {
+function formatCurrency(number) {
   const n = parseFloat(number) || 0;
-  return new Intl.NumberFormat('vi-VN', {
-    minimumFractionDigits: decimalPlaces,
-    maximumFractionDigits: decimalPlaces,
-  }).format(n);
+
+  // Nếu có phần thập phân
+  if (!Number.isInteger(n)) {
+    return new Intl.NumberFormat('vi-VN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n);
+  }
+
+  // Nếu là số nguyên
+  return new Intl.NumberFormat('vi-VN').format(n);
 }
 
 function getDiscountDisplay(rate, amount, total) {
