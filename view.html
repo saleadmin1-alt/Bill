@@ -125,7 +125,7 @@
 </div>
 
 <script>
-function formatCurrency(number, decimalPlaces = 0) {
+function formatCurrency(number, decimalPlaces = 2) {
   const n = parseFloat(number) || 0;
   return new Intl.NumberFormat('vi-VN', {
     minimumFractionDigits: decimalPlaces,
