@@ -263,7 +263,7 @@ async function exportFromTemplate() {
 
   const vatRate = params.get("VAT") || "8%"; // lấy VAT từ URL
 
-sheet.cell("B" + (totalRow + 1)).value("Tổng tiền hàng chưa bao gồm VAT (" + vatRate + "):");
+sheet.cell("B" + (totalRow + 1)).value("Tiền thuế GTGT (" + vatRate + "):");
   sheet.cell("K" + (totalRow+1)).value(Number(params.get("thue") || 0).toLocaleString("vi-VN")+" VND");
   sheet.cell("B" + (totalRow+2)).value("Tổng thanh toán:");
   sheet.cell("K" + (totalRow+2)).value(Number(params.get("tongthanhtoan") || 0).toLocaleString("vi-VN")+" VND");
