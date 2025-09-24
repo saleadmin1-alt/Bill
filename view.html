@@ -29,6 +29,9 @@
     h1 { font-size: 1rem; } h2 { font-size: 1.25rem; } h3 { font-size: 1rem; }
     p, span, div { font-size: 0.75rem; }
 
+
+
+    
     @media print {
       .print-button { display: none; }
       .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
@@ -42,16 +45,14 @@
 </head>
 <body>
 
-<div class="container">
-  <!-- Nút in và xuất excel -->
-  <div class="flex justify-end mb-4 print-button space-x-2">
-    <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out">
-      🖨️ Xuất PDF
-    </button>
-    <button onclick="exportFromTemplate()" class="px-4 py-2 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out">
-      📥 Xuất Excel
-    </button>
-  </div>
+<div class="flex justify-end mb-4 space-x-2 print:hidden">
+  <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out">
+    🖨️ Xuất PDF
+  </button>
+  <button onclick="exportFromTemplate()" class="px-4 py-2 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out">
+    📥 Xuất Excel
+  </button>
+</div>
 
   <!-- ========= THÔNG TIN ĐƠN HÀNG ========= -->
   <div class="flex items-start justify-between mb-6">
