@@ -30,9 +30,12 @@
     p, span, div { font-size: 0.75rem; }
 
 
-
     
     @media print {
+      th, td {
+      font-size: 10px !important; /* nhỏ hơn khi in */
+      padding: 4px !important;    /* giảm padding để bảng gọn hơn */
+    }
       .print-button { display: none; }
       .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
       body { background-color: #fff; margin: 0; padding: 0; }
