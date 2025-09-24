@@ -164,10 +164,10 @@ document.getElementById("customer-info").innerHTML = `
 `;
 
 // Bank info
-const bankCode = params.get("bankcode") || "VCB";
-const account = params.get("sotaikhoan") || "000000000";
+const bankCode = params.get("bankcode") || "VPB";
+const account = params.get("sotaikhoan") || "114210595";
 const accountName = encodeURIComponent(params.get("tennguoithuhuong") || "AURY VIETNAM");
-const amount = params.get("tongthanhtoan") || "0";
+const amount = params.get("conlai") || "0";
 const addInfo = encodeURIComponent("TT " + (params.get("madonhang")||""));
 const qrUrl = `https://img.vietqr.io/image/${bankCode}-${account}-qr_only.png?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`;
 document.getElementById("qr-code").src = qrUrl;
