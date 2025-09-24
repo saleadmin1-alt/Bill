@@ -270,7 +270,9 @@ sheet.cell("B" + (totalRow + 1)).value("Tổng tiền hàng chưa bao gồm VAT 
   sheet.cell("B" + (totalRow+3)).value("Đã tạm ứng:");
   sheet.cell("K" + (totalRow+3)).value(Number(params.get("datamung") || 0).toLocaleString("vi-VN")+" VND");
   sheet.cell("B" + (totalRow+4)).value("Số tiền thanh toán còn lại:");
-  sheet.cell("K" + (totalRow+4)).value(Number(params.get("conlai") || 0).toLocaleString("vi-VN")+" VND");
+  sheet.cell("K" + (totalRow+4)).value(Number(params.get("conlai") || 0).toLocaleString("vi-VN")+" VND").style({
+    bold: true
+  });
 
 
 sheet.cell("C" + (totalRow+9))
@@ -284,11 +286,26 @@ sheet.cell("C" + (totalRow+10))
   .value("(Ký, họ tên)")
   .style("horizontalAlignment", "center");
   
-   sheet.cell("G" + (totalRow+9)).value("Thủ kho");
-   sheet.cell("G" + (totalRow+10)).value("(Ký, họ tên)");
-  sheet.cell("J" + (totalRow+9)).value("Người nhận hàng");
-   sheet.cell("J" + (totalRow+10)).value("(Ký, họ tên)");
+   sheet.cell("G" + (totalRow+9)).value("Thủ kho")
+     .style({
+    horizontalAlignment: "center",
+    bold: true
+  });
 
+  
+  
+  sheet.cell("G" + (totalRow+10))
+  .value("(Ký, họ tên)")
+  .style("horizontalAlignment", "center");
+  
+  sheet.cell("J" + (totalRow+9)).value("Người nhận hàng")
+    .style({
+    horizontalAlignment: "center",
+    bold: true
+  });
+  sheet.cell("J" + (totalRow+10))
+  .value("(Ký, họ tên)")
+  .style("horizontalAlignment", "center");
   
 
   workbook.outputAsync().then(blob => {
