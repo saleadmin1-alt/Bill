@@ -273,8 +273,17 @@ sheet.cell("B" + (totalRow + 1)).value("Tổng tiền hàng chưa bao gồm VAT 
   sheet.cell("K" + (totalRow+4)).value(Number(params.get("conlai") || 0).toLocaleString("vi-VN")+" VND");
 
 
- sheet.cell("C" + (totalRow+9)).value("Người lập phiếu");
-   sheet.cell("C" + (totalRow+10)).value("(Ký, họ tên)");
+sheet.cell("C" + (totalRow+9))
+  .value("Người lập phiếu")
+  .style({
+    horizontalAlignment: "center",
+    bold: true
+  });
+
+sheet.cell("C" + (totalRow+10))
+  .value("(Ký, họ tên)")
+  .style("horizontalAlignment", "center");
+  
    sheet.cell("G" + (totalRow+9)).value("Thủ kho");
    sheet.cell("G" + (totalRow+10)).value("(Ký, họ tên)");
   sheet.cell("J" + (totalRow+9)).value("Người nhận hàng");
