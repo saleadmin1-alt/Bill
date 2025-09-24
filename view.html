@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác nhận đơn hàng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f3f4f6;
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-size: 0.75rem; /* text-xs */
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    th {
+      background-color: #f9fafb;
+      font-weight: 600;
+    }
+    .font-semibold-custom {
+      font-weight: 600;
+    }
+    h1 { font-size: 1rem; }
+    h2 { font-size: 1.25rem; }
+    h3 { font-size: 1rem; }
+    p, span, div { font-size: 0.75rem; }
+
+    @media print {
+      .print-button { display: none; }
+      .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
+      body { background-color: #fff; margin: 0; padding: 0; }
+      @page { size: A4; margin: 1cm; }
+      .table-header-center th { white-space: nowrap; }
+      .breakable-header { white-space: normal; }
+    }
+
+    .table-header-center th { text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="flex justify-end mb-4 print-button">
+    <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out">
+      In PDF
+    </button>
+  </div>
+
+  <div class="flex items-start justify-between mb-6">
+    <div class="flex-shrink-0 flex items-center h-24">
+      <img src="https://drive.google.com/thumbnail?id=1Q4yU0Vg7qiQmwICodsBJ4KzTxva_IeWN&sz=w400" alt="Company Logo" class="rounded-lg h-full object-contain">
+    </div>
+    <div class="flex-grow ml-4 text-left">
+      <h1 class="text-lg font-bold text-gray-800">CÔNG TY TNHH AURY VIỆT NAM</h1>
+      <p class="text-xs text-gray-600 mt-1"><span class="font-bold">Head Office:</span> Lầu 9, Tòa nhà Viễn Đông, 14 Phan Tôn, Phường Tân Định, TP Hồ Chí Minh</p>
+      <p class="text-xs text-gray-600"><span class="font-bold">Showroom:</span> 211 Đỗ Pháp Thuận, Phường Bình Trưng, TP. Hồ Chí Minh</p>
+      <p class="text-xs text-gray-600"><span class="font-bold">Tax code:</span> 0313074659</p>
+      <p class="text-xs text-gray-600"><span class="font-bold">Phone:</span> 0985 190 667 | <span class="font-bold">Email:</span> info@auryvietnam.com | <span class="font-bold">Website:</span> auryvietnam.com</p>
+    </div>
+  </div>
+
+  <div class="text-center my-6">
+    <h2 class="text-2xl font-bold text-gray-900 uppercase">XÁC NHẬN ĐƠN HÀNG</h2>
+    <p id="order-info" class="text-sm text-gray-500 mt-1"></p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 my-4 text-sm">
+    <div class="p-3 border rounded-md border-gray-200 text-gray-700">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">THÔNG TIN MUA HÀNG</h3>
+      <div id="customer-info" class="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1"></div>
+    </div>
+    <div class="p-3 border rounded-md border-gray-200 text-gray-700">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">TÀI KHOẢN THANH TOÁN</h3>
+      <div class="flex justify-start mb-2">
+        <img id="qr-code" class="rounded-lg h-24 w-auto" alt="QR Code">
+      </div>
+      <div id="bank-info" class="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1"></div>
+    </div>
+  </div>
+
+  <div class="my-4">
+    <h3 class="text-lg font-bold text-gray-800 mb-2">CHI TIẾT SẢN PHẨM</h3>
+    <table class="w-full text-xs">
+      <thead>
+        <tr class="table-header-center">
+          <th>Tên sản phẩm</th>
+          <th class="text-right">Số lượng</th>
+          <th>Đơn vị</th>
+          <th class="text-right">Số tấm</th>
+          <th class="text-right">Đơn giá</th>
+          <th class="text-right">Thành tiền</th>
+          <th class="text-right">Chiết khấu</th>
+          <th class="text-right breakable-header">Thành tiền<br>sau CK</th>
+        </tr>
+      </thead>
+      <tbody id="product-rows"></tbody>
+    </table>
+  </div>
+
+  <div class="mt-6 text-sm">
+    <div id="totals" class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 justify-end"></div>
+  </div>
+
+  <div class="flex justify-between mt-10 text-center text-sm">
+    <div class="w-1/3">
+      <p class="font-bold">Người lập phiếu</p>
+      <p class="italic text-gray-500 mt-1">(Ký, họ tên)</p>
+    </div>
+    <div class="w-1/3">
+      <p class="font-bold">Thủ kho</p>
+      <p class="italic text-gray-500 mt-1">(Ký, họ tên)</p>
+    </div>
+    <div class="w-1/3">
+      <p class="font-bold">Người nhận hàng</p>
+      <p class="italic text-gray-500 mt-1">(Ký, họ tên)</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function formatCurrency(number, decimalPlaces = 0) {
+  const n = parseFloat(number) || 0;
+  return new Intl.NumberFormat('vi-VN', {
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
+  }).format(n);
+}
+
+function getDiscountDisplay(rate, amount, total) {
+  if (!rate && !amount) return "";
+  let displayRate = rate;
+  if (rate && !rate.toString().includes("%")) {
+    const num = parseFloat(rate);
+    if (num <= 1) displayRate = (num * 100).toFixed(2) + "%";
+    else displayRate = num.toFixed(2) + "%";
+  }
+  if (!displayRate && amount && total) {
+    const calc = (amount / total) * 100;
+    displayRate = calc.toFixed(2) + "%";
+  }
+  return displayRate + " | " + formatCurrency(amount);
+}
+
+// Parse URL
+const params = new URLSearchParams(window.location.search);
+
+// Order info
+document.getElementById("order-info").innerHTML =
+  `Mã đơn hàng: <span>${params.get("madonhang")}</span><br>
+   Ngày tạo đơn: <span>${params.get("ngaytaodon")}</span>`;
+
+// Customer info
+document.getElementById("customer-info").innerHTML = `
+  <div class="font-semibold-custom">Khách hàng:</div><div>${params.get("tencongty")||""}</div>
+  <div class="font-semibold-custom">Mã số thuế:</div><div>${params.get("masothue")||""}</div>
+  <div class="font-semibold-custom">Địa chỉ công ty:</div><div>${params.get("diachicuahang")||""}</div>
+  <div class="font-semibold-custom">Người liên hệ:</div><div>${params.get("nguoilienhe")||""}</div>
+  <div class="font-semibold-custom">Địa chỉ giao hàng:</div><div>${params.get("diachigiaohang")||""}</div>
+  <div class="font-semibold-custom">Điện thoại:</div><div>${params.get("sodienthoai")||""}</div>
+  <div class="font-semibold-custom">Email:</div><div>${params.get("email")||""}</div>
+`;
+
+// Bank info
+const bankCode = params.get("bankcode") || "VCB";
+const account = params.get("sotaikhoan") || "000000000";
+const accountName = encodeURIComponent(params.get("tennguoithuhuong") || "AURY VIETNAM");
+const amount = params.get("tongthanhtoan") || "0";
+const addInfo = encodeURIComponent("TT " + (params.get("madonhang")||""));
+const qrUrl = `https://img.vietqr.io/image/${bankCode}-${account}-qr_only.png?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`;
+document.getElementById("qr-code").src = qrUrl;
+
+document.getElementById("bank-info").innerHTML = `
+  <div class="font-semibold-custom">Tên ngân hàng:</div><div>${params.get("tennganhang")||""}</div>
+  <div class="font-semibold-custom">Swift code:</div><div>${params.get("swiftcode")||""}</div>
+  <div class="font-semibold-custom">Số tài khoản:</div><div>${account}</div>
+  <div class="font-semibold-custom">Người thụ hưởng:</div><div>${decodeURIComponent(accountName)}</div>
+`;
+
+// Product details
+const data = params.get("data") || "";
+const products = data.split("_n_").map(row => row.split("_"));
+
+let tbody = "";
+products.forEach(p => {
+  if (p.length < 8) return;
+  tbody += `
+    <tr>
+      <td>${p[0]}</td>
+      <td class="text-right">${formatCurrency(p[1])}</td>
+      <td>${p[2]}</td>
+      <td class="text-right">${formatCurrency(p[3])}</td>
+      <td class="text-right">${formatCurrency(p[4])}</td>
+      <td class="text-right">${formatCurrency(p[5])}</td>
+      <td class="text-right">${getDiscountDisplay(p[6], p[7], p[5])}</td>
+      <td class="text-right">${formatCurrency(p[8] || (p[5]-p[7]))}</td>
+    </tr>
+  `;
+});
+document.getElementById("product-rows").innerHTML = tbody;
+
+// Totals
+document.getElementById("totals").innerHTML = `
+  <div class="font-semibold text-gray-700">Tổng tiền hàng chưa bao gồm VAT:</div>
+  <div class="text-gray-900 font-bold text-right">${formatCurrency(params.get("thanhtoanchuaVAT"))} VNĐ</div>
+  <div class="font-semibold text-gray-700">Tiền thuế GTGT:</div>
+  <div class="text-gray-900 font-bold text-right">${formatCurrency(params.get("thue"))} VNĐ</div>
+  <div class="font-semibold text-gray-700">Tổng thanh toán:</div>
+  <div class="text-indigo-600 font-bold text-right">${formatCurrency(params.get("tongthanhtoan"))} VNĐ</div>
+  <div class="font-semibold text-gray-700">Đã tạm ứng:</div>
+  <div class="text-gray-900 font-bold text-right">${formatCurrency(params.get("datamung"))} VNĐ</div>
+  <div class="font-semibold text-gray-700">Số tiền thanh toán còn lại:</div>
+  <div class="text-red-500 font-bold text-right">${formatCurrency(params.get("conlai"))} VNĐ</div>
+`;
+</script>
+</body>
+</html>
