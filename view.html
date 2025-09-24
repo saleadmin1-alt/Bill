@@ -188,12 +188,12 @@ products.forEach(p => {
   tbody += `
     <tr>
       <td>${p[0]}</td>
-      <td class="text-right">${formatCurrency(p[1])}</td>
-      <td>${p[2]}</td>
-      <td class="text-right">${formatCurrency(p[3])}</td>
+      <td class="text-center">${formatCurrency(p[1])}</td>
+     <td class="text-center">${p[2]}</td>
+      <td class="text-center">${formatCurrency(p[3])}</td>
       <td class="text-right">${formatCurrency(p[4])}</td>
       <td class="text-right">${formatCurrency(p[5])}</td>
-      <td class="text-right">${getDiscountDisplay(p[6], p[7], p[5])}</td>
+      <td >${getDiscountDisplay(p[6], p[7], p[5])}</td>
       <td class="text-right">${formatCurrency(p[8] || (p[5]-p[7]))}</td>
     </tr>
   `;
@@ -262,6 +262,16 @@ async function exportFromTemplate() {
   sheet.cell("K" + (totalRow+3)).value(Number(params.get("datamung") || 0).toLocaleString("vi-VN")+" VND");
   sheet.cell("B" + (totalRow+4)).value("Số tiền thanh toán còn lại:");
   sheet.cell("K" + (totalRow+4)).value(Number(params.get("conlai") || 0).toLocaleString("vi-VN")+" VND");
+
+
+ sheet.cell("C" + (totalRow+9)).value("Người lập phiếu");
+   sheet.cell("C" + (totalRow+10)).value("(Ký, họ tên)");
+   sheet.cell("G" + (totalRow+9)).value("Thủ kho");
+   sheet.cell("G" + (totalRow+10)).value("(Ký, họ tên)");
+  sheet.cell("J" + (totalRow+9)).value("Người nhận hàng");
+   sheet.cell("J" + (totalRow+10)).value("(Ký, họ tên)");
+
+  
 
   workbook.outputAsync().then(blob => {
     const url = window.URL.createObjectURL(blob);
