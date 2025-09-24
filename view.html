@@ -235,7 +235,7 @@ async function exportFromTemplate() {
   const sheet = workbook.sheet(0);
 
   // Ghi dữ liệu vào Excel (giống code trước của bạn)...
-  sheet.cell("F6").value(params.get("madonhang"));
+  sheet.cell("F6").value("Mã đơn hàng:"+madonhang);
   sheet.cell("F7").value(params.get("ngaytaodon"));
   sheet.cell("C9").value(params.get("tencongty"));
   sheet.cell("C10").value(params.get("masothue"));
